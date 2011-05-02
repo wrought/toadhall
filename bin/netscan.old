@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+
+import threading, socket, time
+
+hosts = {}
+
+class NetChecker(threading.Thread):
+    def __init__(self, host):
+        threading.Thread.__init__(self)
+        self.host = host
+        self.setDaemon(1)
+
+    def run(self):
+        try:
+            s = socket.socket()
+            s.connect((self.host, 139))
+            hosts[self.host] = 1
+        except: pass
+
+def getleases(filename):
+    ipaddr = None
+    leases = {}
+    now = time.gmtime(time.time())[:6]
+    for line in open(filename):
+        line = line.strip()
+        if line.endswith(';'):
+            line = line[:-1]
+            line = line.strip()
+        words = line.split()
+        if words:
+            if words[0] == 'lease':
+                ipaddr = words[1]
+                fields = {}
+                fields['start'] = (0, 0, 0, 0, 0, 0)
+                fields['end'] = (0, 0, 0, 0, 0, 0)
+                fields['mac'] = ''
+                fields['name'] = ''
+                fields['abandoned'] = 0
+            elif words[0] == '}':
+                if fields['start'] <= now <= fields['end']:
+                    if not fields['abandoned']:
+                        leases[ipaddr] = fields
+                ipaddr = None
+            elif ipaddr:
+                if words[0] == 'starts':
+                    y, l, d = map(int, words[2].split('/'))
+                    h, m, s = map(int, words[3].split(':'))
+                    fields['start'] = (y, l, d, h, m, s)
+                elif words[0] == 'ends':
+                    y, l, d = map(int, words[2].split('/'))
+                    h, m, s = map(int, words[3].split(':'))
+                    fields['end'] = (y, l, d, h, m, s)
+                elif words[:2] == ['hardware', 'ethernet']:
+                    fields['mac'] = words[2]
+                elif words[0] == 'client-hostname':
+                    name = words[1]
+                    if name.startswith('"'):
+                        name = eval(name)
+                    fields['name'] = name
+                elif words[0] == 'abandoned':
+                    fields['abandoned'] = 1
+    return leases
+
+leases = getleases('/var/lib/dhcp3/dhcpd.leases')
+
+leases['10.0.0.1'] = {'name': 'bigglesworth'}
+leases['10.0.0.2'] = {'name': 'printer'}
+leases['10.0.0.3'] = {'name': 'half-fish'}
+leases['10.0.0.4'] = {'name': 'churchy'}
+leases['10.0.0.100'] = {'name': 'christian'}
+leases['10.0.0.101'] = {'name': 'david'}
+leases['10.0.0.102'] = {'name': 'milou'}
+leases['10.0.0.103'] = {'name': 'jukebox'}
+
+checkers = []
+for ipaddr in leases:
+    checkers.append(NetChecker(ipaddr))
+for checker in checkers:
+    checker.start()
+
+time.sleep(2)
+for ipaddr in hosts:
+    print ipaddr, leases[ipaddr]['name'] or '?'

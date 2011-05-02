@@ -1,0 +1,96 @@
+<table width="100%" cellspacing="0" cellpadding="0" id="events-notes">
+<tr valign="top"><td id="events-cell">
+<div id="events">
+
+<!-- __ upcoming __ lists events from today onwards in forward order. -->
+<!-- __ recent __ lists events from yesterday backwards in reverse order. -->
+<!-- __ today __ shows just today's events. -->
+<!-- __ events __ lists recent and upcoming events in reverse order. -->
+
+<div class="heading">
+<h2>Upcoming</h2>
+</div>
+
+<div class="content events">
+__upcoming__
+</div>
+
+<div class="heading">
+<h2>Recent</h2>
+</div>
+
+<div class="content events">
+__recent__
+</div>
+
+<div class="heading">
+<h2>Add an Event</h2>
+</div>
+
+<div class="content">
+<a name="event-entry"></a>
+__event_preview__
+<form action="go.cgi" method="post">
+<table cellpadding="0" cellspacing="0" class="form">
+<tr><td class="label required">Date:</td>
+<td><select name="month">
+__month_options__
+</select>
+<select name="day">
+__day_options__
+</select></td></tr>
+<tr><td class="label required">Title:</td>
+<td><input type="text" name="title" value="__title__" size="36"></td></tr>
+<tr class="label-row"><td class="label">Details:</td>
+<td><textarea rows="4" cols="36" name="details">__details__</textarea></td></tr>
+<tr><td></td><td class="label">See <a href="kwiki/kwiki_help">help</a> for instructions on formatting.</td></tr>
+<tr class="buttons"><td colspan="2">
+<input type=hidden name=object value="event">
+<input type="submit" name="action" value="preview">
+<input type="submit" name="action" value="add an event">
+</td></tr>
+</table>
+</form>
+</div>
+
+</div>
+
+</td><td id="notes-cell">
+
+<div id="notes">
+
+<div class="heading">
+<h2>Notes</h2>
+</div>
+
+<div class="content">
+__notes__
+</div>
+
+<div class="heading">
+<h2>Post a Note</h2>
+</div>
+
+<div class="content">
+<a name="note-entry"></a>
+__note_preview__
+<form action="go.cgi" method="post">
+<table cellpadding="0" cellspacing="0" class="form">
+<tr><td class="label required">Name:</td>
+<td><input type="text" name="name" value="__name__" size="36"></td></tr>
+<tr class="label-row"><td class="label required">Note:</td>
+<td><textarea rows="4" cols="36" name="note">__note__</textarea></td></tr>
+<tr><td></td><td class="label">See <a href="kwiki/kwiki_help">help</a> for instructions on formatting.</td></tr>
+<tr class="buttons"><td colspan="2">
+<input type=hidden name=object value="note">
+<input type=submit name=action value="preview">
+<input type=submit name=action value="post a note">
+<input type=submit name=action value="ask the house a kwestion">
+</td></tr>
+</table>
+</form>
+</div>
+
+</div>
+
+</td></tr></table>

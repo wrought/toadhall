@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+
+import sys, os, re, time, calendar
+
+def show(hr, min, times):
+    avg = reduce(lambda x, y: x+y, times) / len(times)
+    bars = avg / 50
+    if bars > 50: bars = ('=' * 50) + (' > %d!' % avg)
+    else: bars = '=' * bars
+    print '%2d:%02d - %5d ms %s' % (hr, min, avg, bars)
+
+def report(file):
+    m = re.match('(....)-(..)-(..)', file)
+    y, l, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    w = calendar.weekday(y, l, d)
+    print '%04d-%02d-%02d (%s %d %s %d)' % (
+        y, l, d, calendar.day_name[w], d, calendar.month_name[l], y)
+    f = open(file)
+    times, failed = [], 0
+    for line in f.readlines():
+    	if line[:4] == '====':
+	    if failed: print '%2d:%02d -          NO RESPONSE' % (hr, min)
+	    elif times and hr is not None: show(hr, min, times)
+	    m = re.search('(....)-(..)-(..) (..):(..)', line)
+	    if m: hr, min = int(m.group(4)), int(m.group(5))
+	    else: hr, min = None, None
+	    times, failed = [], 0
+	else:
+	    m = re.search('time=([0-9]+)', line)
+            if m: times.append(int(m.group(1)))
+	    if re.search('0 packets received', line): failed = 1
+    if times and hr and min: show(hr, min, times)
+
+os.chdir('/root/pingtimes')
+files = os.listdir('.')
+files.sort()
+if len(sys.argv) > 1:
+    file = sys.argv[1]
+    if file == 'butlast': file = files[-2]
+    if file == 'last': file = files[-1]
+    report(file)
+else:
+    for file in files:
+	if re.match('(....)-(..)-(..)', file):
+	    report(file)
+            print

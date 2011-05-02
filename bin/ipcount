@@ -1,0 +1,16 @@
+#!/bin/sh
+
+file=$1
+addrs="10.0.0.1 10.0.0.2 10.0.0.3"
+i=1
+while [ $i -lt 64 ]; do
+    addrs="$addrs 10.0.1.$i"
+    i=$(expr $i + 1)
+done
+for addr in $addrs; do
+    grep -F $addr. $file > /tmp/count.$$
+    if [ -s /tmp/count.$$ ]; then
+        wc -l /tmp/count.$$ | awk '{printf "%12s  %5d\n", "'$addr'", $1}'
+    fi
+done
+rm /tmp/count.$$

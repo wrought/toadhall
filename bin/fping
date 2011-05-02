@@ -1,0 +1,22 @@
+#!/bin/sh
+
+tmp=/tmp/fping.$$
+echo "#!/bin/sh" > $tmp.sh
+echo "exec /bin/ping -c 1 $1 | grep time= > $tmp.ok" >> $tmp.sh
+chmod 755 $tmp.sh
+$tmp.sh 1>/dev/null 2>/dev/null &
+pid=$!
+test -s $tmp.ok || sleep 0.2
+test -s $tmp.ok || sleep 0.2
+test -s $tmp.ok || sleep 0.2
+test -s $tmp.ok || sleep 0.2
+test -s $tmp.ok || sleep 0.2
+rm -f $tmp.sh
+if [ -s $tmp.ok ]; then
+    rm -f $tmp.ok
+    exit 0
+else
+    rm -f $tmp.ok
+    kill $pid 1>/dev/null 2>/dev/null
+    exit 1
+fi

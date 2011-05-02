@@ -1,0 +1,3 @@
+#!/bin/sh
+
+od -A x -t xCz "$@"

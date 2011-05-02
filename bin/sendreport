@@ -1,0 +1,4 @@
+#!/bin/sh
+
+/root/bin/report butlast | /bin/mail -s "Round-trip DSL timing data for 209.204.144.35" ping@lfw.org
+# /home/ping/bin/report butlast | /bin/mail -s "[Sonic #118472] Round-trip DSL timing data for 209.204.144.35" ddacosta@sonic.net ping@lfw.org

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd /web/internal
+tail -1000 dns.txt > tail
+mv tail dns.txt
+tail -1000 speed.txt > tail
+mv tail speed.txt
+tail -1000 trace.txt > tail
+mv tail trace.txt

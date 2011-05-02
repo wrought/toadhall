@@ -1,0 +1,55 @@
+#!/usr/bin/python -S
+
+from utils import *
+from fastcgi import os, client
+
+oldevents = 5
+newevents = 5
+maxevents = 12
+maxnotes = 24
+
+prologue('Kingman Hall Home Page', 'style.css')
+
+html = readfile('status.html')
+write(subst(html, dns=readfile('/tmp/status.dns'),
+                  printer=readfile('/tmp/status.printer'),
+                  half_fish=readfile('/tmp/status.half-fish'),
+                  jukebox=readfile('/tmp/status.jukebox'),
+                  dsl=readfile('/tmp/status.dsl')))
+
+if os.popen('/root/bin/hoggers').read().find(client) > 0:
+    write(strong('Your Internet connection was disabled due to excessive use.'))
+    write(br)
+    write(' It has just been reactivated (because you visited this page). ')
+    write(p)
+    os.system('/root/bin/unhog ' + client)
+
+write(readfile('links.html'))
+
+html = readfile('events-notes.html')
+
+events = getevents()
+events.sort()
+today = getdate()
+first, last = 0, len(events)
+for i in range(len(events)):
+    date, title, details = events[i]
+    if date < today: first = i
+    if date > today: last = i; break
+nearby = events[max(first - oldevents, 0):
+                min(last + newevents, len(events))]
+nearby.reverse()
+eventrows = map(formatevent, nearby[:maxevents])
+seeall = link('events.cgi', '(see all %d events)' % len(events))
+eventrows.append(tr(td(seeall, colspan=2)))
+
+notes = getnotes()
+notes.reverse()
+
+noterows = map(formatnote, notes[:maxnotes])
+seeall = link('notes.cgi', '(see all %d notes)' % len(notes))
+noterows.append(tr(td(seeall, colspan=2)))
+
+write(subst(html, events=table(eventrows), notes=table(noterows)))
+
+epilogue()

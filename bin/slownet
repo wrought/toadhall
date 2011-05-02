@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import os, re, time
+
+namepat = re.compile('hostname.*"([^"]+)"')
+def getname(ip):
+    pipe = os.popen('/root/bin/dhwho %s' % ip, 'r')
+    for line in pipe.readlines():
+        m = namepat.search(line)
+        if m: return m.group(1)
+
+def execat(schedule, command):
+    pipe = os.popen('/usr/bin/at "%s" 2>/dev/null' % schedule, 'w')
+    pipe.write(command)
+    pipe.close()
+
+log = open('/web/internal/speed.txt', 'a')
+y, l, d, h, m, s = time.localtime()[:6]
+date = '%04d-%02d-%02d' % (y, l, d)
+stamp = '%04d-%02d-%02d %02d:%02d' % (y, l, d, h, m)
+
+os.chdir('/root/usage/%s' % date)
+files = os.listdir('.')
+files.sort()
+recent = files[-5:]
+usage = {}
+delays = []
+
+for file in recent:
+    lines = open(file).readlines()
+    delay = int(lines[0].split()[2])
+    delays.append(delay)
+
+    for line in lines[1:]:
+        packets, bytes, dir, user = line.split()
+        # if dir == '<--':
+        usage[user] = usage.get(user, 0) + int(bytes)
+
+print >>log, '%s - %s' % (stamp, ', '.join(['%s ms' % d for d in delays]))
+
+now = time.time()
+permits = {}
+for line in os.popen('tail /web/internal/permits.txt').readlines():
+    expiry, address = line.split()[:2]
+    name = line.split(' - ')[1].strip()
+    if now < int(expiry): permits[address] = name
+if permits:
+    print >>log, '%s - active permits: %s' % (stamp, ', '.join(permits.keys()))
+
+if 1 in [d > 1000 for d in delays]:
+    hogs = [(usage[user], user) for user in usage]
+    hogs.sort()
+    hogs.reverse()
+    hs = ', '.join(['%s (%d kb/s)' %
+        (user, int(bytes/120/1000)) for bytes, user in hogs[:3]])
+    print >>log, '%s - top users %s' % (stamp, hs)
+
+    bytes, worst = hogs[0]
+    name = getname(worst)
+    tag = name and '%s (%s)' % (worst, name) or worst
+    if bytes > 2000000 and worst.startswith('10.0.'):
+        if worst in permits:
+            print >>log, '%s - %s got a permit for %s to hog the line' % (
+                stamp, permits[worst], tag)
+        else:
+            print >>log, os.popen('/root/bin/ipmasq %s' % worst).read()
+            print >>log, '%s - cutting off %s' % (stamp, tag)
+            os.system('/sbin/ipchains -A hog -s %s -j REJECT' % worst)
+            execat('now + 20 min', '/root/bin/admit %s' % worst)

@@ -1,0 +1,52 @@
+<div class="content">
+<table width="100%" cellspacing="0" cellpadding="0" id="links">
+<tr class="search-row"><td class="search-cell">
+<form action="go.cgi" method="get"><p>
+<input type="text" name="key" size="18"
+>&nbsp;&nbsp;<input name="action" type="submit" value="Google"
+>&nbsp;<input name="action" type="submit" value="Wikipedia"
+>&nbsp;<input name="action" type="submit" value="Dictionary"
+>&nbsp;<input name="action" type="submit" value="Recipes">
+<p>&nbsp;<p>
+<table cellspacing="0" cellpadding="0">
+<tr class="label"><td>Address or Business Name</td>
+<td>&nbsp;&nbsp;</td>
+<td>City in CA (or City, State)</td></tr>
+<tr class="form-row">
+<td><input type="text" name="addr" size="18"></td>
+<td>&nbsp;&nbsp;</td>
+<td><input type="text" name="city" size="14" value="Berkeley"
+>&nbsp;&nbsp;<input name="action" type="submit" value="Map"
+>&nbsp;<input name="action" type="submit" value="Directions">
+</td>
+</tr>
+</table>
+</form>
+<p class="last">
+The House PC in the study room is backed up every ten minutes.<br>
+If you do work on it, you may be able to
+<a href="crash.html">recover your lost work</a>.
+</td>
+<td class="links-cell">
+<ul class="links">
+<li><a href="http://usca.org/current/">USCA</a></li>
+<li><a href="http://news.google.com/" title="News collected from sources around the world.">Google News</a></li>
+<li><a href="https://sis.berkeley.edu/bearfacts/student/registration.do?bfaction=displayClassSchedules&amp;termStatus=CT" title="Direct link into BearFacts (no more clicking through extra pages).">BearFacts</a></li>
+<li><a href="http://calmail.berkeley.edu/">CalMail</a></li>
+<li><a href="http://gmail.com/">Gmail</a></li>
+<li><a href="http://hotmail.com/">Hotmail</a></li>
+<li><a href="http://mail.yahoo.com/">Yahoo Mail</a></li>
+</ul>
+</td>
+<td class="links-cell">
+<ul class="links">
+<li><a href="kwiki" title="Read and contribute to Kingman's collected wisdom here.">Kwiki</a></li>
+<li><a href="workshifts.cgi" title="Check your recorded workshift hours and up/down status.">Workshifts</a></li>
+<li><a href="maintenance.cgi" title="Post your maintenance requests here.">Maintenance</a></li>
+<li><a href="http://kingmanhall.org/photos/" title="The house photo album.">Photos</a></li>
+<li><a href="members.cgi" title="Add your contact details here.">Member Directory</a></li>
+<li><a href="netscan.cgi" title="A list of the computers currently on the house network.">Network Directory</a></li>
+<li><a href="hotness.cgi" title="How hot is the house this semester?">Kingman's HQ = __hotness_quotient__</a></li>
+</ul>
+</td></tr></table>
+</div>

@@ -1,0 +1,64 @@
+#!/bin/sh
+
+ping=/web/internal/bin/fping
+www_berkeley_edu=169.229.131.109
+www_google_com=216.239.35.100
+traceroute="/usr/sbin/traceroute -q 1 -n $www_berkeley_edu"
+lookup="/usr/bin/dig +time=1 +retry=3 kingmanhall.org"
+
+($ping 10.0.0.2 && echo UP || echo DOWN) > /tmp/status.printer
+($ping 10.0.0.3 && echo UP || echo DOWN) > /tmp/status.half-fish
+($ping 10.0.0.4 && echo UP || echo DOWN) > /tmp/status.jukebox
+($lookup 2>&1 | grep "ANSWER SECTION" > /dev/null 2>&1 && echo UP || echo DOWN) > /tmp/status.dns
+
+date=`date +'%Y-%m-%d'`
+time=`date +'%H:%M'`
+
+if [ `cat /tmp/status.dns` = DOWN ]; then
+    echo "$date $time - DNS down" >> /web/internal/speed.txt
+    echo $date $time >> /web/internal/dns.txt
+    $lookup >> /web/internal/dns.txt 2>&1
+    echo >> /web/internal/dns.txt
+    # /etc/init.d/named restart > /dev/null 2>&1
+fi
+
+if [ -n "`date | grep ':.0:'`" ]; then
+    echo $date $time >> /web/internal/trace.txt
+    $traceroute >> /web/internal/trace.txt 2>&1
+    echo >> /web/internal/trace.txt
+fi
+
+/web/internal/bin/tping 209.204.144.1 | grep rtt > /tmp/testnet.$$
+if [ -s /tmp/testnet.$$ ]; then
+    delay=`cat /tmp/testnet.$$ | cut -d= -f2 | cut -d/ -f2 | cut -d. -f1`
+    if [ $delay -lt 100 ]; then
+        speed=FAST
+    elif [ $delay -lt 600 ]; then
+        speed=MODERATE
+    else
+        speed=SLOW
+    fi
+else
+    delay=9999
+    speed=DOWN
+fi
+echo $speed > /tmp/status.dsl
+
+if [ "$speed" != "MODERATE" ]; then
+    oldspeed=`tail -100 /web/internal/speed.txt | grep 'network is' | tail -1 | sed -e 's/.*network is //'`
+    if [ "$speed" != "$oldspeed" ]; then
+        echo "$date $time - network is $speed" >> /web/internal/speed.txt
+    fi
+fi
+
+# mkdir -p /root/usage/$date
+# log=/root/usage/$date/$time
+# echo "ping delay: $delay ms" > $log
+# /root/bin/ipac >> $log
+# /root/bin/ipz
+# 
+# if [ $delay -ge 300 ]; then
+#     /root/bin/slownet
+# fi
+
+rm -f /tmp/testnet.$$

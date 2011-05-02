@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/root/bin/iplog /tmp/iplog.$$
+/root/bin/ipcount /tmp/iplog.$$
+rm /tmp/iplog.$$

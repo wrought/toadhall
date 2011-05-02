@@ -1,0 +1,155 @@
+<script>
+function highlightMembers() {
+    var object = document.getElementById('object').value;
+    var members = document.getElementsByTagName('div');
+    for (var i = 0; i < members.length; i++) {
+        var classes = members[i].className.split(' ');
+        if (classes.length >= 2 && classes[1] == 'member') {
+            members[i].className = classes[0] + ' member' + (
+                object.match(classes[0]) ? ' selected' : ' deselected');
+        }
+    }
+}
+</script>
+
+<div class="hotness">
+
+<h1>What is Kingman's Hotness Quotient?</h1>
+
+<p>According to this highly controlled scientific study,
+if you are a Kingmanite,
+__hq__ of the house would totally do you.
+More specifically:
+<ul>
+If you're female, __fhq__ of a random sample of Kingmanites (__ffhq__ of the women and __mfhq__ of the men) would totally do you.<br>
+If you're male, __mhq__ of a random sample of Kingmanites (__fmhq__ of the women and __mmhq__ of the men) would totally do you.
+</ul>
+
+<p>__n__ people have submitted answers to this survey so far.
+<p>
+
+<div class="form">
+<form action="hotness.cgi" method="post">
+<h2>Hotness Quotient for FALL 2008!</h2>
+<p>
+I'm 
+<select name=subject>
+<option value="">(choose)</option>
+<option value=f>female</option>
+<option value=m>male</option>
+</select>,
+I'm attracted to
+<select id=object name=object onchange="highlightMembers()">
+<option value="">(choose)</option>
+<option value=f>women</option>
+<option value=m>men</option>
+<option value=mf>both</option>
+</select>
+and
+I would totally do
+<input name=number type=text size=3>
+of my housemates.
+
+<p>
+<!-- <input name=button type=button disabled value="The survey is not yet open."> -->
+<input name=submit type=submit value="Submit your answer.">
+<!-- <input name=button type=button disabled value="The survey has ended."> -->
+
+</form>
+</div>
+
+<p>
+For reference, here's a house list:
+
+<table cellpadding=0 cellspacing=0 border=0 class="house-list">
+<tr>
+<th>First Floor</th>
+<th colspan=2>Second Floor</th>
+<th colspan=2>Third Floor</th>
+<th colspan=2>Boarders</th></tr>
+<tr>
+<td>
+<div class="f member deselected">1A Madelyn</div>
+<div class="m member deselected">1B Xavier</div>
+<div class="m member deselected">1C Mikie</div>
+<div class="m member deselected">1D Willie</div>
+<div class="f member deselected">1E Marjon</div>
+<div class="m member deselected">1F Ben</div>
+<div class="m member deselected">1F Jarrod</div>
+<div class="m member deselected">1G Tanvir</div>
+<div class="m member deselected">1G Charlie</div>
+<div class="f member deselected">1H Michelle</div>
+<div class="f member deselected">1H Catherine</div>
+</td><td>
+<div class="m member deselected">2A Dexter</div>
+<div class="m member deselected">2A Daniel</div>
+<div class="m member deselected">2B Kosta</div>
+<div class="m member deselected">2B Julien</div>
+<div class="f member deselected">2C Jenn</div>
+<div class="f member deselected">2C Jenny</div>
+<div class="m member deselected">2D David</div>
+<div class="f member deselected">2D Juliana</div>
+<div class="f member deselected">2E Becca</div>
+<div class="m member deselected">2E Nick</div>
+<div class="m member deselected">2E Said</div>
+</td><td>
+<div class="f member deselected">2F Dani</div>
+<div class="f member deselected">2G Tracy</div>
+<div class="m member deselected">2H Jonathan</div>
+<div class="m member deselected">2I Pedro</div>
+<div class="m member deselected">2I Robert</div>
+<div class="f member deselected">2J Alix</div>
+<div class="f member deselected">2J Meredith</div>
+<div class="f member deselected">2K Anna</div>
+<div class="f member deselected">2K Rebecca</div>
+<div class="f member deselected">2L Caitlyn</div>
+<div class="f member deselected">2L Barbara</div>
+</td><td>
+<div class="m member deselected">3A David K.</div>
+<div class="m member deselected">3B Tim</div>
+<div class="f member deselected">3B Francesca</div>
+<div class="m member deselected">3C Colin</div>
+<div class="f member deselected">3C Madeline</div>
+<div class="f member deselected">3D Aly</div>
+<div class="f member deselected">3D Sophia</div>
+<div class="f member deselected">3E Dara</div>
+<div class="f member deselected">3E Martha</div>
+<div class="f member deselected">3F Amy</div>
+<div class="f member deselected">3F Amelia</div>
+</td><td>
+<div class="m member deselected">3G Andy</div>
+<div class="m member deselected">3G Jeff</div>
+<div class="f member deselected">3H Brianna</div>
+<div class="m member deselected">3I Dennis</div>
+<div class="m member deselected">3J Geoff</div>
+<div class="m member deselected">3J Konstantin</div>
+</td><td>
+<div class="f member deselected">Nitzan</div>
+<div class="m member deselected">Dwight</div>
+<div class="f member deselected">Hanna</div>
+<div class="f member deselected">Sarah</div>
+<div class="f member deselected">Shannon</div>
+<div class="m member deselected">Galen</div>
+<div class="f member deselected">Lisa</div>
+<div class="m member deselected">Christopher</div>
+<div class="m member deselected">Rafael</div>
+<div class="m member deselected">Seth</div>
+<div class="m member deselected">Hunter</div>
+</td><td>
+<div class="f member deselected">Michelle R.</div>
+<div class="m member deselected">David B.</div>
+<div class="m member deselected">Griffin</div>
+<div class="f member deselected">Caitlin</div>
+<div class="m member deselected">Robb</div>
+<div class="m member deselected">Scott</div>
+</td>
+</tr></table>
+
+<p>
+(This page is only visible to computers inside Kingman Hall.)
+
+</div>
+
+<script>
+highlightMembers();
+</script>

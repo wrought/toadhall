@@ -1,0 +1,424 @@
+body, input, textarea { 
+    font-family: "Lucida Grande", Verdana, sans-serif; font-size: 11px; }
+a:link, a:visited { text-decoration: none; color: #00f; }
+a.plain { color: #000; }
+a:hover { text-decoration: underline; }
+table { border-collapse: collapse; border-spacing: 0; }
+th, td { padding: 0; }
+tr { vertical-align: baseline; }
+tr.label-row, tr.search-row { vertical-align: top; }
+tr.form-row { vertical-align: bottom; white-space: nowrap; }
+td.textarealabel { vertical-align: top; }
+td.label { padding-right: 3px; padding-top: 3px; }
+input, select, textarea, .selector { font-size: 11px; }
+div.selector { color: #888; padding: 0 0 3px 0; }
+ul, li, dl, dd { margin-top: 0.5em; margin-bottom: 0.5em; }
+ul { list-style: disc; }
+h2 { font-size: 17px; }
+h3 { font-size: 14px; margin-top: 1.5em; }
+p { margin-top: 1em; margin-bottom: 0.5em; }
+form, form p { margin: 0; }
+p.last { padding-bottom: 0; margin-bottom: 0; }
+.form { margin: 1em 0; }
+td .form { margin: 5px 0; }
+img { border: none; }
+div { position: relative; }
+div.announcement { font-size: 16px; font-weight: bold;
+    color: #f00; background: #fee; text-align: center;
+    padding: 18px; border: 1px solid red; margin: 12px; }
+.warning { color: #f00; visibility: hidden; }
+.label.required { color: #a00; }
+
+/* Network scan page. */
+table.netscan {
+    border-right: 1px solid #ccc;
+}
+.netscan td, .netscan th {
+    text-align: left; padding: 3px 12px 3px 6px;
+    border-left: 1px solid #ccc;
+}
+.netscan th { background: #ddf; }
+.netscan tr.even { background: #eef; }
+.netscan .note { font-weight: normal; font-size: 9px; }
+.netscan th { padding-bottom: 10px; }
+.netscan td.shares { font-size: 9px; }
+.footer { clear: both; text-align: center; border-top: 1px solid #ddf;
+          font-size: 9px; margin-top: 2em; padding-top: 3px; color: #aaa; }
+.footer a { color: #88f; }
+
+div.problems { color: #c00; background: #ff8; font-size: 9px; padding: 3px;
+    margin: 5px 0; border: 3px solid #c00; }
+
+/* Workshift page. */
+.menu { margin: 0 3em; }
+.menu tr { vertical-align: top; }
+tr.pageheading { vertical-align: middle; }
+h1.workshift a:hover { text-decoration: none; }
+h1.workshift { font-size: 60px; font-weight: normal; margin: 0;
+    font-family: Cochin, Baskerville, Georgia, serif; }
+h1.workshift .w0 { color: #2768ba; margin-right: -0.1em; } /* kern "Wo" */
+h1.workshift .w1 { color: #c13b2c; }
+h1.workshift .w2 { color: #ebc34f; }
+h1.workshift .w3 { color: #2768ba; }
+h1.workshift .w4 { color: #5ea946; }
+h1.workshift .w5 { color: #c13b2c; }
+h1.workshift .w6 { color: #ebc34f; }
+h1.workshift .w7 { color: #5ea946; }
+h1.workshift .w8 { color: #2768ba; }
+h1.workshift .w9 { color: #c13b2c; }
+
+div.workshift { background: #eef; border: 1px dotted #88c;
+                margin-top: 1.5em; padding: 12px; }
+div.workshift div.title { font-weight: bold; font-size: 14px; }
+div.workshift div.description { margin: 1em 0 0; }
+.weekday { text-transform: uppercase; font-weight: bold; }
+div.workshift li { margin-top: 0.5em; }
+div.workshift ul { margin-top: 0.5em; }
+.bathroom-humour th { text-align: left; white-space: nowrap;
+    font-weight: normal; color: #669; }
+.bathroom-humour th, .bathroom-humour td { padding: 0 1em 2px 0; }
+.bathroom-humour tr.soon { background: #d9f; }
+.bathroom-humour.recent tr.soon { background: inherit; }
+.bathroom-humour.recent tr.future td.date { color: #669; }
+.bathroom-humour tr.future td.date { color: #000; }
+.bathroom-humour tr.pending td.down { color: #970; }
+.bathroom-humour tr.future td.down { color: #000; }
+.pending { color: #970; }
+td.bathroom, td.humour { width: 50%; }
+
+.up { color: #080; }
+.down { color: #800; }
+.error { font-weight: bold; color: #f00; }
+
+.datebox { width: 114px; border-left: 3px solid white; }
+.datebox .content { text-align: center; }
+.datebox .content table { margin-top: -5px; }
+.datebox .soon { color: #e00; }
+table.week { margin: 0 auto; }
+.week .number { font-size: 3em; font-weight: bold; }
+.week td { vertical-align: middle; }
+
+table.workshifts { background: #fff; margin-top: -20px; }
+table.workshifts td { padding: 1px 4px; }
+table.workshifts th { color: #ccc; font-weight: normal; padding: 0 4px; }
+table.workshifts .week { color: black; font-size: inherit; font-weight: bold; }
+table.workshifts .section { background: #e0e0f0; color: #888; }
+table.workshifts .total { color: #ccc; }
+table.workshifts .final { font-weight: bold; }
+table.workshifts .final .total { font-weight: normal; }
+table.workshifts .section.up { color: #080; }
+table.workshifts .section.down { color: #800; }
+table.workshifts tr.section td { border-top: 8px solid #fff; }
+
+.banner { font-weight: bold; font-size: 2em; color: #fff;
+          width: 100%; height: 1.4em; position: relative; }
+.banner img { width: 100%; height: 1.4em; }
+.banner table { width: 100%; height: 1em; position: absolute; top: 0.15em; }
+.banner td { text-align: center; width: 4%; opacity: 0.5; color: #fff; }
+
+.heading { background: #d0d0ff; padding: 1px 3px; margin-top: 5px;
+           font-size: 11px; border-bottom: 1px solid #c0c0e0; }
+.heading h2 { font-size: 11px; font-weight: bold;
+              text-transform: uppercase; margin: 0; display: inline; }
+.heading ul, .heading li { display: inline; color: #88c; white-space: nowrap; }
+.heading ul.links { position: absolute; right: 4px; margin: 0; }
+.heading ul.links li { padding: 0 2px 0 6px;
+                       border-left: 1px solid #bbd; }
+.state { font-weight: bold; }
+
+.content { background: #eef; padding: 3px; }
+/* This makes the purple "today" bar go to the left/right edges of the table. */
+.content.events table { margin: 0px -3px; }
+.content.events table td.date { padding-left: 3px; }
+.content.events table td.body { padding-right: 3px; }
+tr.buttons td { padding-top: 0.5em; }
+
+#links td.link { text-align: center; width: 12%; white-space: nowrap; }
+#links td#help { text-align: center; width: 16%; }
+#links form { white-space: nowrap; }
+.label { font-size: 9px; color: #666; }
+tr.today { background: #d9f; }
+div.today tr.today { background: none; }
+.past { color: #888; }
+.author, .title { font-weight: bold; }
+
+td.links-cell ul, td.links-cell li, ul.links, ul.links li { margin: 0; padding: 0; list-style-type: none; }
+td.links-cell li, ul.links li { white-space: nowrap; padding: 2px; }
+td.search-cell { padding-right: 8px; width: 60%; }
+td.links-cell { width: 15%; padding: 0 4px; }
+div.search-buttons { text-align: right; padding: 3px; }
+
+table.notes tr { vertical-align: top; }
+table.notes td.body, table.notes td.date { padding-top: 2px; }
+table.notes td.date { width: 5%; }
+table.notes td.body { width: 45%; padding-right: 10px; }
+tr.even { background: #ddf; }
+.date { color: #669; padding: 0 3px 0 0; white-space: nowrap; }
+.time { font-size: 9px; }
+span.date, span.time { display: block; }
+td.body { padding: 0 0 0.5em 0; }
+td.body p { margin: 0.5em 0 0 0; }
+.files .date, .files .size { padding-right: 1.5em; }
+.size { text-align: right; }
+
+/* This is now done with a table because the floats fail on Mac IE 5.
+div#events { width: 49%; float: left; }
+div#notes { width: 49%; float: right; }
+*/
+td#events-cell { border-right: 3px solid white; width: 49%; }
+td#notes-cell { border-left: 3px solid white; width: 49%; }
+
+td.fieldname { text-align: right; padding-right: 6px; white-space: nowrap; }
+
+.members .sort { font-weight: normal; }
+.members th { text-align: left; }
+.members td { padding-top: 3px; }
+.members th.name { width: 15em; }
+.members th.room { width: 5em; }
+.members th.phone { width: 10em; }
+.members th.e-mail { width: 20em; }
+
+.hotness div.form { margin: 0 3em; padding: 12px; text-align: center;
+    background: #fee; border: 1px solid red; }
+.hotness form p { margin: 1em 0; }
+.house-list th, .house-list td { padding: 2px 3px; border: 1px solid white; }
+.house-list th { text-align: left; background: #d0d0ff; }
+.house-list div.member { width: 8em; padding: 1px 0; }
+.house-list .deselected { color: #aaa; }
+.house-list .selected { color: #000; }
+
+.vocs div.deadline { margin: 0 3em; padding: 12px; text-align: center;
+    background: #fee; border: 1px solid red; font-size: 15px; }
+table.members div.disabled { color: #888; text-decoration: line-through; }
+table.members div { padding: 1px 16px 1px 0; white-space: nowrap; }
+table.members { padding: 0.5em 12px; background: #efe; border: 1px solid #080; }
+table.members td { padding: 0.5em 0; }
+.vocs form p, .elections form p { margin: 1em 0; }
+.vocs form table.textarea { margin: 0.25em 0 0 0; }
+.vocs form table.textarea td { padding-right: 5px; }
+.elections input { text-align: right; }
+.elections .manager input { margin: 1px 1px 1px 16px; }
+.elections .manager h2 { margin: 1em 0 0; font-size: 15px; }
+.manager { margin: 1.75em 0; }
+.manager div { margin: 0 0 0 0.5em; display: inline; }
+.manager div.disabled { color: #888; text-decoration: line-through; }
+table.vocs { padding: 0.5em; border: 1px solid #888; margin: auto; }
+table.vocs th, table.vocs td { text-align: center; width: 7em; }
+.vocs h2 { margin: 1.5em 0 0.5em 0; }
+.vocs ul { margin: 0.5em 0 1em 0; }
+.vocs li { margin: 0.5em 0 0 0; }
+.vocs h1 { margin: 0; padding: 0; }
+.vocs h1 + h2 { margin-top: 1em; }
+.vocs ul { max-width: 40em; padding-left: 2em; }
+.vocs li { margin: 0.4em 0 0 0; }
+
+/* Living Love chicanery. */
+.love { position: absolute; color: #f44; display: none; }
+
+/* Printer supplies page. */
+.printer th { text-align: left; vertical-align: bottom; }
+.printer .date { padding-right: 6px; border-right: 1px dotted #888; }
+.printer .toner { padding-left: 6px; border-left: 1px dotted #888; }
+.printer .printed { padding-left: 6px; }
+.printer .remaining { padding-right: 6px; }
+.printer th.printed { text-align: left; }
+.printer th.toner { text-align: left; }
+.printer th table { width: 100%; }
+.printer .bars table { width: 100%; margin-top: 2px; }
+.printer .tonerbars table { margin-top: 2px; }
+.printer .printed { text-align: right; width: 4em; padding-right: 6px; }
+.printer .remaining { text-align: right; width: 4em; }
+.printer .toner { text-align: right; width: 4em; padding-right: 6px; }
+.printer .printedbar { background: #f80; height: 10px; }
+.printer .remainingbar { background: #0d0; height: 10px; }
+.printer .tonerbar { background: #06d; height: 10px; }
+.printer .tonerusedbar { background: #dbf; height: 10px; }
+.printer td { padding-top: 0px; vertical-align: top; }
+
+/* Wiki index view. */
+/* .wiki .body { font-size: 12px; } */ /* Not sure this is good... */
+.wiki .body { border-top: 1px solid #ddf; }
+.wiki .current { font-weight: bold; }
+.wiki .meta { float: right; text-align: right; }
+.wiki .meta .id { font-weight: bold; }
+.wiki .tags { color: #a00; }
+.wiki span.versions { color: #888; font-weight: normal; font-size: 9px; }
+.wiki div.tags { margin: 0.5em 0 1.5em; padding: 0; }
+.wiki div.access { color: #082; font-size: 11px; font-weight: bold; margin: 1em 0; }
+.wiki div.filter-options { margin: 1em 0; }
+.wiki div.filter-options input[type="checkbox"] { vertical-align: bottom; margin-bottom: 1px; }
+.wiki h2, .wiki h3 { margin: 2em 0 0; padding: 0; }
+.wiki h1.title { margin-bottom: 0; }
+.wiki input.title { font-size: 2em; font-weight: normal; }
+.wiki .label { margin: 1em 0 2px; }
+.wiki .actions { margin: 1em 0; }
+.wiki form { margin-right: 5px; margin-top: 1em; }
+.wiki textarea, .wiki input.text { width: 100%; }
+.wiki th, .wiki th.date { text-align: left; font-weight: bold; }
+.wiki th, .wiki td { padding-top: 2px; }
+.wiki .version div:hover { text-decoration: underline; }
+.wiki .number, .wiki .version, .wiki .datedesc { padding-right: 1em; }
+.wiki .number, .wiki .version, .wiki .date { text-align: right; }
+.wiki th.datedesc { text-align: left; }
+.wiki td.datedesc { text-align: right; }
+.wiki .datedesc { color: #669; }
+.wiki table.pages .title { padding-left: 1em; }
+.wiki table.pages .title .tags { font-weight: normal; }
+.wiki table.pages .title.retired-page { font-weight: normal; }
+.wiki table.pages .title.hidden-page { font-weight: normal; }
+.wiki .hour-old { background: #ffe4c8; }
+.wiki .day-old { background: #fff0e0; }
+.wiki.edit table.summary { margin: -4px 0 0; }
+.wiki .tag-list { float: right; margin-left: 1em; }
+.wiki .tag-list a.tag { color: #a00; }
+.wiki .tag-list a.tag:hover { color: #a00; }
+.wiki .tag-list table.once { margin: 1em 0 0; }
+.wiki .tag-list table.once td { font-size: 9px; width: 15em; }
+.wiki table.legend { margin: 1em 0; }
+.wiki .legend td { padding: 5px; }
+
+/* Wiki page view. */
+.wiki div.tags { margin: 0.75em 0 1.5em; padding: 0; }
+.wiki #tags-menubar { position: absolute; margin-top: 3px; cursor: default; }
+.wiki #tags-menubar td { padding: 0; color: #a00; }
+.wiki #tags-menubar td.arrow { vertical-align: top; text-align: center;
+    font-size: 7px; color: #ffc0c0; padding-bottom: 8px; }
+.wiki #tags-menubar td.arrow .empty { color: #e8e8e8; }
+.wiki #tags-menubar td.arrow:hover { color: #a00; font-size: 9px; }
+.wiki #tags-menubar td.arrow.selected { color: #a00; font-size: 9px; }
+.wiki #tags-menubar td.arrow:hover .empty { color: #888; }
+.wiki #tags-menubar td.arrow.selected .empty { color: #888; }
+.wiki div.tag-menu { position: absolute; z-index: 1; background: #e4e4e4;
+    border: 3px solid white; border-top: none; padding: 2px; margin: -6px -4px;
+    white-space: nowrap; color: #888; font-size: 9px; visibility: hidden; }
+.wiki div.tag-menu ul { list-style: none; margin: 0; padding: 0; }
+.wiki div.tag-menu li { font-size: 11px; margin: 0; padding: 2px 0; }
+.wiki #tags-form { margin: -3px -4px; padding: 0; visibility: hidden; }
+.wiki #tags-form input { margin: 0px 1px; padding: 0px 1px; }
+.wiki #tags-form td { padding: 0; white-space: nowrap; }
+.wiki #tags-form td.field { width: 99%; padding: 0 5px 0 0; }
+.wiki .excerpt { font-weight: normal; color: #888; }
+.wiki .match { font-weight: bold; color: #060; }
+.wiki .preview { padding: 1em; background: #eef; }
+.wiki .preview h1 { margin-top: 0; }
+.wiki .toc { width: 30%; float: right; padding: 0 0 1em 1em; }
+.wiki .toc .heading { margin: 0; }
+.wiki .toc ul { list-style: none; padding-left: 1em; margin-left: 0; }
+.wiki .toc li { list-style: none; padding-left: 0; margin-left: 0; }
+
+/* Wiki history view. */
+.wiki div.history { float: right; }
+.wiki .history .current { font-weight: bold; }
+.wiki .history .add-count { color: #090; }
+.wiki .history .remove-count { color: #a00; }
+.wiki .history .name { padding: 0 0.5em; }
+.wiki .history .words { text-align: right; padding-right: 1em; color: #669; }
+.wiki .history .delta { color: #888; }
+.wiki .history .tag { color: #c88; }
+.wiki .history .edit { color: #88c; }
+.wiki .history .title { color: #66a; }
+a.wiki:hover { text-decoration: none; border-bottom: 1px dotted #00f; }
+a.missing { color: #060; }
+a.missing:hover { text-decoration: none; border-bottom: 1px dotted #060; }
+a .moved { color: #060; }
+a .moved:hover { color: inherit; }
+
+/* Photo album. */
+table.photos td.folder h3 { margin: 0 0 0.5em; }
+table.photos td { padding: 0 10px; }
+table.photos td.photo { width: 202px; height: 202px; /* 200 + 2px borders */
+    text-align: center; vertical-align: middle;
+    background-position: center; background-repeat: no-repeat; }
+table.photos td.photo img {
+    border: 1px solid #888; display: block; margin: auto; }
+table.photos td.caption {
+    text-align: center; padding: 0.25em 10px 2em; position: relative; }
+table.photos .date { float: left; }
+table.photos .time { float: right; font-size: 100%; color: #669; }
+table.photos .count { float: right; }
+table.photos .model { clear: both; float: left; font-size: 9px; color: #888; }
+table.photos .flash { float: right; font-size: 9px; color: #888; }
+.hidden { display: none; }
+.turners div { position: absolute; top: -2px; text-align: center; width: 100%; }
+.turners img { border: none; cursor: pointer; }
+
+
+.wiki .tag-list tr.c2 { color: #b4b4b4; } 
+.wiki .tag-list tr.c2 a.tag { color: #e6b4b4; } 
+.wiki .tag-list tr.c3 { color: #979797; } 
+.wiki .tag-list tr.c3 a.tag { color: #dc9797; } 
+.wiki .tag-list tr.c4 { color: #7f7f7f; } 
+.wiki .tag-list tr.c4 a.tag { color: #d47f7f; } 
+.wiki .tag-list tr.c5 { color: #6d6d6d; } 
+.wiki .tag-list tr.c5 a.tag { color: #ce6d6d; } 
+.wiki .tag-list tr.c6 { color: #5f5f5f; } 
+.wiki .tag-list tr.c6 a.tag { color: #ca5f5f; } 
+.wiki .tag-list tr.c7 { color: #545454; } 
+.wiki .tag-list tr.c7 a.tag { color: #c65454; } 
+.wiki .tag-list tr.c8 { color: #4b4b4b; } 
+.wiki .tag-list tr.c8 a.tag { color: #c34b4b; } 
+.wiki .tag-list tr.c9 { color: #444444; } 
+.wiki .tag-list tr.c9 a.tag { color: #c04444; } 
+.wiki .tag-list tr.c10 { color: #3e3e3e; } 
+.wiki .tag-list tr.c10 a.tag { color: #be3e3e; } 
+.wiki .tag-list tr.c11 { color: #383838; } 
+.wiki .tag-list tr.c11 a.tag { color: #bd3838; } 
+.wiki .tag-list tr.c12 { color: #343434; } 
+.wiki .tag-list tr.c12 a.tag { color: #bb3434; } 
+.wiki .tag-list tr.c13 { color: #303030; } 
+.wiki .tag-list tr.c13 a.tag { color: #ba3030; } 
+.wiki .tag-list tr.c14 { color: #2d2d2d; } 
+.wiki .tag-list tr.c14 a.tag { color: #b92d2d; } 
+.wiki .tag-list tr.c15 { color: #2a2a2a; } 
+.wiki .tag-list tr.c15 a.tag { color: #b82a2a; } 
+.wiki .tag-list tr.c16 { color: #272727; } 
+.wiki .tag-list tr.c16 a.tag { color: #b72727; } 
+.wiki .tag-list tr.c17 { color: #252525; } 
+.wiki .tag-list tr.c17 a.tag { color: #b62525; } 
+.wiki .tag-list tr.c18 { color: #232323; } 
+.wiki .tag-list tr.c18 a.tag { color: #b52323; } 
+.wiki .tag-list tr.c19 { color: #212121; } 
+.wiki .tag-list tr.c19 a.tag { color: #b52121; } 
+.wiki .tag-list tr.c20 { color: #202020; } 
+.wiki .tag-list tr.c20 a.tag { color: #b42020; } 
+.wiki .tag-list tr.c21 { color: #1e1e1e; } 
+.wiki .tag-list tr.c21 a.tag { color: #b41e1e; } 
+.wiki .tag-list tr.c22 { color: #1d1d1d; } 
+.wiki .tag-list tr.c22 a.tag { color: #b31d1d; } 
+.wiki .tag-list tr.c23 { color: #1c1c1c; } 
+.wiki .tag-list tr.c23 a.tag { color: #b31c1c; } 
+.wiki .tag-list tr.c24 { color: #1a1a1a; } 
+.wiki .tag-list tr.c24 a.tag { color: #b31a1a; } 
+.wiki .tag-list tr.c25 { color: #191919; } 
+.wiki .tag-list tr.c25 a.tag { color: #b21919; } 
+.wiki .tag-list tr.c26 { color: #181818; } 
+.wiki .tag-list tr.c26 a.tag { color: #b21818; } 
+.wiki .tag-list tr.c27 { color: #171717; } 
+.wiki .tag-list tr.c27 a.tag { color: #b21717; } 
+.wiki .tag-list tr.c28 { color: #171717; } 
+.wiki .tag-list tr.c28 a.tag { color: #b11717; } 
+.wiki .tag-list tr.c29 { color: #161616; } 
+.wiki .tag-list tr.c29 a.tag { color: #b11616; } 
+.wiki .tag-list tr.c20 { font-weight: bold; }
+.wiki .tag-list tr.c21 { font-weight: bold; }
+.wiki .tag-list tr.c22 { font-weight: bold; }
+.wiki .tag-list tr.c23 { font-weight: bold; }
+.wiki .tag-list tr.c24 { font-weight: bold; }
+.wiki .tag-list tr.c25 { font-weight: bold; }
+.wiki .tag-list tr.c26 { font-weight: bold; }
+.wiki .tag-list tr.c27 { font-weight: bold; }
+.wiki .tag-list tr.c28 { font-weight: bold; }
+.wiki .tag-list tr.c29 { font-weight: bold; }
+
+/* Energy usage. */
+.energy table td { padding: 1px 4px; }
+.energy table th { padding: 1px 4px; }
+.sparkline { text-align: right; }
+.energy .summary tr { vertical-align: top; }
+.energy .summary th { padding: 4px; }
+.energy .summary .electricity { color: #390; }
+.energy .summary .gas { color: #60f; }
+.energy .summary td.last-month { text-align: right; padding-top: 13px; }
+.energy .summary .head th { background: #cdf; border-left: 2px solid #fff; }
+.energy .location { font-weight: bold; max-width: 40em; }
+.energy .location .details { font-weight: normal; font-size: 9px; color: #888; }

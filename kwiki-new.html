@@ -1,0 +1,25 @@
+<div class="wiki" id="wiki">
+
+<div class="meta" id="meta">
+<a href="./kwiki_help">help</a> &middot;
+<a href=".">index</a>
+</div>
+
+<h1>Create a new page</h1>
+<form method=post action="./:save">
+<div class="label required">Title:</div>
+<p><input class="title text" type=text size=40 name=title value="__title__">
+<div class="label">Tags:</div>
+<p><input class="tags text" type=text size=60 name=tags value="__tags__">
+<div class="label required">Content (see <a href="kwiki_help">help</a> for instructions on formatting):</div>
+<p><textarea class="body" name=body rows=20 cols=60>
+__body__</textarea>
+<div class="label required">Your name:</div>
+<input type=text size=20 name=name>
+<div class="actions">
+<input type=hidden name=new value="1">
+<input type=submit name=preview value="preview">
+<input type=submit name=submit value="create page">
+</div>
+</form>
+</div>

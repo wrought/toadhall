@@ -1,0 +1,46 @@
+<p>
+Welcome to the super-secret administration page!
+
+<p>
+There are some <a href="ll">Living Love files</a> here.
+
+<h2>Announcement</h2>
+
+<p>
+You can set the big announcement that appears on the main page.
+
+<p>
+<form action="announce.cgi">
+<textarea rows=5 cols=40 name="announcement">
+__announcement__
+</textarea>
+<input type=submit value="Post">
+</form>
+
+<h2>Surveys</h2>
+
+<p>
+Current status: __survey_status__
+
+<p>
+<form action="surveys.cgi">
+<table><tr style="vertical-align: top"><td>
+<select name="survey" size=10>
+__surveys__
+</select>
+</td>
+<td style="width: 30em">
+<input type=submit name=action value="Set up a new survey"><br>
+<input type=submit name=action value="View or edit the selected survey"><br>
+<input type=submit name=action value="Open the selected survey"><br>
+<input type=submit name=action value="Close the current survey"><br>
+<p>
+Only one survey may be open at a time.
+When you open a survey,
+it will appear at <a href="/survey.cgi">survey.cgi</a>
+for members to fill out.
+(You may want to use the text box above
+to announce the survey and provide a link to it.)
+</td></tr>
+</table>
+</form>

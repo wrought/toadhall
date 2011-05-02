@@ -1,0 +1,10 @@
+#!/bin/sh
+
+addr=$1
+name=$1
+if echo $addr | grep -E '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' > /dev/null;
+then true; else addr=10.0.$addr; fi
+
+/sbin/ipchains -N $name
+/sbin/ipchains -A input -s $addr -j $name
+/sbin/ipchains -A output -d $addr -j $name

@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+              "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>Kingman Hall: Sandbox</title>
+<link rel="stylesheet" href="style2.css"></head><body>
+<!-- This rainbow is an image; the title is superimposed on the image. -->
+
+<a href="/"><div class="banner"><img src="spectrum.png">
+<table cellspacing="0" cellpadding="0" border="0"><tr>
+<td>&nbsp;</td>
+<td>K</td>
+<td>&middot;</td>
+<td>I</td>
+<td>&middot;</td>
+<td>N</td>
+<td>&middot;</td>
+
+<td>G</td>
+<td>&middot;</td>
+<td>M</td>
+<td>&middot;</td>
+<td>A</td>
+<td>&middot;</td>
+<td>N</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>H</td>
+<td>&middot;</td>
+
+<td>A</td>
+<td>&middot;</td>
+<td>L</td>
+<td>&middot;</td>
+<td>L</td>
+<td>&nbsp;</td>
+</tr></table>
+</div></a>
+<style>
+.wiki .tag-menus td, .wiki .tag-menus th { padding: 0; color: #a00; }
+table.tag-menus td.arrow { text-align: center; font-size: 7px; color: #fcc;
+    cursor: pointer; padding-bottom: 5px; }
+table.tag-menus td.arrow:hover { color: #a00; }
+/* table.tag-menus td.tag { padding-bottom: 1px; border-bottom: 5px solid #fcc; } */
+</style>
+<script>
+var tags_editing = 0, just_cancelled = 0;
+var tags, tags_text, tags_form, tags_field, tags_original;
+var tags_submit, tags_cancel;
+
+function $(id) {
+    return document.getElementById(id);
+}
+function show_tag_form(event) {
+    if (just_cancelled) {
+        just_cancelled = 0;
+    } else {
+        tags_text.style.display = 'none';
+        tags_form.style.display = 'block';
+    }
+}
+function hide_tag_form(event) {
+    if (tags_field.value == tags_original.value) {
+        tags_editing = 0;
+    }
+    if (!tags_editing) {
+        tags_text.style.display = 'block';
+        tags_form.style.display = 'none';
+    }
+}
+function focus_tag_form() {
+    tags_editing = 1;
+    show_tag_form();
+}
+function cancel_tag_form() {
+    tags_field.value = tags_original.value;
+    tags_editing = 0;
+    just_cancelled = 1;
+    hide_tag_form();
+}
+function show_menu(tag) {
+    alert(tag);
+}
+</script>
+<div class="wiki" id="wiki">
+<div class="meta" id="meta">
+<a href=".">index</a> &middot;
+<span class="current">view</span> &middot;
+<a href="./__id__:edit">edit</a> &middot;
+<a href="./__id__:history">history</a><br>
+version __version__ (__date__)
+</div>
+<h1 class="title">__title__</h1>
+<div style="position: relative">
+<div class="text" style="position: absolute; top: 0; left: 0">
+<table class="tag-menus" cellspacing=0 cellpadding=0 border=0>
+<tr class="tags"><td class="tag">home</td><td>,&nbsp;</td><td class="tag">policy</td></tr>
+<tr><td class="arrow" onclick="show_menu('home')">&#x25bc;</td><td></td>
+<td class="arrow" onclick="show_menu('policy')">&#x25bc;</td></tr>
+</table>
+<!--
+<tr style="font-size: 8px">
+<td align=center>v</td><td></td>
+<td align=center>v</td></tr></table>
+-->
+</div>
+<div class="tags" id="tags"
+     onmouseover="show_tag_form(event)" onmouseout="hide_tag_form(event)">
+<div class="text" id="tags-text">&nbsp;
+</div>
+<!--
+<div class="text" id="tags-text">__tags__&nbsp;</div>
+-->
+<div class="form" id="tags-form">
+<form method=post action="./__id__:save">
+<table cellpadding=0 cellspacing=0 class="tags"><tr><td class="field">
+<input type=hidden name=tags-original id="tags-original" value="home, policy">
+<input class="tags text" id="tags-field" type=text name=tags size=50
+       value="home, policy" onfocus="focus_tag_form()">
+</td><td>
+<input type=submit name=submit id="tags-submit" value="save tags">
+</td><td>
+<input type=button id="tags-cancel" value="cancel" onclick="cancel_tag_form()">
+</td></tr></table>
+</form></div>
+</div>
+</div>
+<!--
+<table cellspacing=0 cellpadding=0 border=0>
+<tr><td>kng</td><td>,&nbsp;</td>
+<td>official</td><td>,&nbsp;</td><td>policy</td></tr>
+<tr style="font-size: 6px">
+<td align=center>v</td><td></td>
+<td align=center>v</td><td></td>
+<td align=center>v</td>
+</tr>
+</table>
+-->
+__body__
+</div>
+<script>
+tags = $('tags');
+tags_text = $('tags-text');
+tags_form = $('tags-form');
+tags_field = $('tags-field');
+tags_submit = $('tags-submit');
+tags_cancel = $('tags-cancel');
+tags_original = $('tags-original');
+</script>

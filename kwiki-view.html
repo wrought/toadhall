@@ -1,0 +1,112 @@
+<script type="text/javascript">
+var editing = 0, just_cancelled = 0, current_menu = '';
+var tags_form, tags_field, tags_submit, tags_cancel, tags_menubar;
+var original_tags = '__tags__';
+
+function $(id) {
+    return document.getElementById(id);
+}
+function enter_tag_form() {
+    if (just_cancelled) {
+        just_cancelled = 0;
+    } else if (!current_menu) {
+        tags_form.style.visibility = 'visible';
+        tags_menubar.style.visibility = 'hidden';
+    }
+}
+function exit_tag_form() {
+    if (!editing) {
+        tags_form.style.visibility = 'hidden';
+        tags_menubar.style.visibility = 'visible';
+    }
+}
+function focus_tag_form() {
+    editing = 1;
+}
+function blur_tag_form() {
+    if (tags_field.value == original_tags) editing = 0;
+    exit_tag_form();
+}
+function cancel_tag_form() {
+    tags_field.value = original_tags;
+    editing = 0;
+    exit_tag_form();
+    just_cancelled = 1;
+}
+function show_menu(tag) {
+    if (tag != current_menu) {
+        var tag_menu = $('menu-' + tag);
+        var tag_arrow = $('arrow-' + tag);
+        tag_menu.style.visibility = 'visible';
+        tag_arrow.className = 'arrow selected';
+        hide_menu();
+        current_menu = tag;
+        tags_menubar.style.zIndex = 1; // hovering over tag names opens menus
+    }
+}
+function hover_menu(tag) {
+    if (current_menu) show_menu(tag);
+}
+function hide_menu() {
+    if (current_menu) {
+        $('menu-' + current_menu).style.visibility = 'hidden';
+        $('arrow-' + current_menu).className = 'arrow';
+        current_menu = '';
+        tags_menubar.style.zIndex = 0; // hovering over tag names edits them
+    }
+}
+document.onclick = hide_menu;
+</script>
+<div class="wiki" id="wiki">
+
+<div class="meta" id="meta">
+<a href="./kwiki_help" title="Get help on how to use the Kwiki."
+>help</a> &middot;
+<a href="." title="See a searchable list of all the Kwiki pages."
+>index</a> &middot;
+<span class="current">view</span> &middot;
+<a href="./__id__:edit" title="Edit the current version of this page."
+>edit</a> &middot;
+<a href="./__id__:history" title="List all the past versions of this page."
+>history</a><br>
+__prev__ <span class="current">version __version__</span> (__date__) __next__
+</div>
+
+<h1 class="title">__title__</h1>
+
+<div class="tags">
+
+<div id="tags-menubar">
+__tagmenus__
+</div>
+
+<div onmouseover="enter_tag_form(event)" onmouseout="exit_tag_form(event)">
+<form id="tags-form" method=post action="./__id__:save">
+<table cellpadding=0 cellspacing=0 border=0><tr><td class="field">
+<input type=hidden name="name" value="-">
+<input class="tags text" id="tags-field" type=text name=tags size=50
+       value="__tags__" onfocus="focus_tag_form()" onblur="blur_tag_form()">
+</td><td>&nbsp;&nbsp;<input
+    type=submit name=submit id="tags-submit" value="save tags"
+>&nbsp;<input
+    type=button id="tags-cancel" value="cancel" onclick="cancel_tag_form()">
+</td></tr></table>
+</form>
+</div>
+
+</div>
+
+__access__
+<div class="body">
+__toc__
+<br>
+__body__
+</div>
+</div>
+<script type="text/javascript">
+tags_form = $('tags-form');
+tags_field = $('tags-field');
+tags_submit = $('tags-submit');
+tags_cancel = $('tags-cancel');
+tags_menubar = $('tags-menubar');
+</script>

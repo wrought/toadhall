@@ -1,0 +1,15 @@
+#!/bin/sh
+
+date=`date +'%Y-%m-%d'`
+time=`date +'%H:%M'`
+if [ -n "$1" ]; then
+    addr=$1
+    echo "$date $time - readmitting" $addr >> /web/internal/speed.txt
+    /root/bin/unhog $addr >/dev/null 2>/dev/null
+else
+    addrs=`/sbin/ipchains -nL hog | grep '^REJECT' | awk '{print $4}'`
+    if [ -n "$addrs" ]; then
+        echo "$date $time - readmitting" $addrs >> /web/internal/speed.txt
+        /sbin/ipchains -F hog
+    fi
+fi

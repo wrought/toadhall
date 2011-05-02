@@ -1,0 +1,12 @@
+#!/bin/sh
+
+addr=$1
+port=$2
+if echo $addr | grep -E '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' > /dev/null;
+then true; else addr=10.0.$addr; fi
+
+if [ -n "$port" ]; then
+    /sbin/ipchains -D forward -s $addr -p tcp --destination-port $port -j DENY
+else
+    /sbin/ipchains -D forward -s $addr -j DENY
+fi

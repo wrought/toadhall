@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ -z "$4" ]; then
+    echo "usage: backup <source-UNC-path> <target-path> <source-max-age> <backup-days-to-live>"
+    exit 1
+fi
+
+source=$1       # UNC path to source share
+target=$2       # local path to backup directory
+maxage=$3       # ignore source files older than this
+daystolive=$4   # remove backups older than this
+
+date=`date +%Y-%m-%d`
+if [ -n "`echo $maxage | grep minute`" ]; then
+    date=`date +%Y-%m-%d.%H.%M`
+fi
+
+cd $target
+touch -d "$maxage ago" stamp
+smbclient $source '' -N -d0 -TNc stamp - 2>/dev/null | gzip > "$date.tar.gz"
+sizes=`tar tvfz "$date.tar.gz" | awk '{print $3}' | grep -v '^0$'`
+if [ -z "$sizes" ]; then
+    rm $date.tar.gz
+else
+    echo FILES ARCHIVED
+    tar tvfz $date.tar.gz | grep -v '      0'
+fi
+rm stamp
+find . -mtime +$daystolive -exec rm '{}' ';' 2>/dev/null
+chmod a+rx . * 2>/dev/null

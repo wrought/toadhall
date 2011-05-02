@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+              "http://www.w3.org/TR/html4/strict.dtd"><html><head><title>Kingman Hall: Sandbox</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<!-- This rainbow is an image; the title is superimposed on the image. -->
+
+<a href="/"><div class="banner"><img src="spectrum.png">
+<table cellspacing="0" cellpadding="0" border="0"><tr>
+<td>&nbsp;</td>
+<td>K</td>
+<td>&middot;</td>
+<td>I</td>
+<td>&middot;</td>
+<td>N</td>
+<td>&middot;</td>
+
+<td>G</td>
+<td>&middot;</td>
+<td>M</td>
+<td>&middot;</td>
+<td>A</td>
+<td>&middot;</td>
+<td>N</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+<td>H</td>
+<td>&middot;</td>
+
+<td>A</td>
+<td>&middot;</td>
+<td>L</td>
+<td>&middot;</td>
+<td>L</td>
+<td>&nbsp;</td>
+</tr></table>
+</div></a>
+<style>
+.wiki div.tags { margin: 0.75em 0 1.5em; padding: 0; }
+.wiki #tags-menubar { position: absolute; margin-top: 3px; }
+.wiki #tags-menubar td { padding: 0; color: #a00; }
+.wiki #tags-menubar td.arrow { text-align: center; font-size: 7px;
+    color: #fcc; cursor: pointer; padding-bottom: 8px; }
+.wiki #tags-menubar td.arrow:hover { color: #a00; }
+.wiki #tags-menubar td.arrow.selected { color: #a00; }
+.wiki div.tag-menu { position: absolute; background: #e4e4e4;
+    border: 2px solid white; border-top: none; padding: 2px; margin: -6px -4px;
+    white-space: nowrap; color: #888; font-size: 9px; visibility: hidden; }
+.wiki div.tag-menu ul { list-style: none; margin: 0; padding: 0; }
+.wiki div.tag-menu li { font-size: 11px; margin: 0; padding: 2px 0; }
+.wiki #tags-form { margin: -3px -4px; padding: 0; visibility: hidden; }
+.wiki #tags-form input { margin: 0; }
+.wiki #tags-form td { padding: 0 0 0 5px; }
+.wiki #tags-form td.field { width: 99%; padding: 0 5px 0 0; }
+</style>
+<script>
+var editing = 0, just_cancelled = 0, current_menu = '';
+var tags_form, tags_field, tags_submit, tags_cancel, tags_menubar;
+var original_tags = 'home, policy';
+
+function $(id) {
+    return document.getElementById(id);
+}
+function enter_tag_form() {
+    if (just_cancelled) {
+        just_cancelled = 0;
+    } else if (!current_menu) {
+        tags_form.style.visibility = 'visible';
+        tags_menubar.style.visibility = 'hidden';
+    }
+}
+function exit_tag_form() {
+    if (!editing) {
+        tags_form.style.visibility = 'hidden';
+        tags_menubar.style.visibility = 'visible';
+    }
+}
+function focus_tag_form() {
+    editing = 1;
+}
+function blur_tag_form() {
+    if (tags_field.value == original_tags) editing = 0;
+    exit_tag_form();
+}
+function cancel_tag_form() {
+    tags_field.value = original_tags;
+    editing = 0;
+    exit_tag_form();
+    just_cancelled = 1;
+}
+function show_menu(tag) {
+    if (tag != current_menu) {
+        var tag_menu = $('menu-' + tag);
+        var tag_arrow = $('arrow-' + tag);
+        tag_menu.style.visibility = 'visible';
+        tag_arrow.className = 'arrow selected';
+        hide_menu();
+        current_menu = tag;
+    }
+}
+function hover_menu(tag) {
+    if (current_menu) show_menu(tag);
+}
+function hide_menu() {
+    if (current_menu) {
+        $('menu-' + current_menu).style.visibility = 'hidden';
+        $('arrow-' + current_menu).className = 'arrow';
+        current_menu = '';
+    }
+}
+document.onclick = hide_menu;
+</script>
+<div class="wiki" id="wiki">
+<div class="meta" id="meta">
+<a href=".">index</a> &middot;
+<span class="current">view</span> &middot;
+<a href="./__id__:edit">edit</a> &middot;
+<a href="./__id__:history">history</a><br>
+version __version__ (__date__)
+</div>
+<h1 class="title">__title__</h1>
+
+<div class="tags">
+
+<div id="tags-menubar">
+<table cellspacing=0 cellpadding=0 border=0>
+<tr><td id="tag-home" onmouseover="hover_menu('home')">home</td><td>,&nbsp;</td>
+<td id="tag-policy" onmouseover="hover_menu('policy')">policy</td></tr>
+<tr><td id="arrow-home" class="arrow" onmouseover="hover_menu('home')"
+    onclick="event.stopPropagation(); show_menu('home')">&#9660;</td><td></td>
+<td id="arrow-policy" class="arrow" onmouseover="hover_menu('policy')"
+    onclick="event.cancelBubble = 1; show_menu('policy')">&#9660;</td></tr>
+<tr><td>
+<div class="tag-menu" id="menu-home">
+4 other pages tagged <span class="tags">home</span>:<ul>
+<li><a href="Home">Home</a>
+<li><a href="Home Foo">Home Foo</a>
+<li><a href="a">This is a somewhat long title</a>
+<li><a href="b">This is a somewhat even longer title</a></ul>
+</div>
+</td><td></td><td>
+<div class="tag-menu" id="menu-policy">
+3 other pages tagged <span class="tags">policy</span>:<ul>
+<li><a href="Bylaws">Bylaws</a>
+<li><a href="Constitution">Constitution</a>
+<li><a href="Policies">Policies</a></ul>
+</div>
+</td></tr>
+</table>
+</div>
+
+<div onmouseover="enter_tag_form(event)" onmouseout="exit_tag_form(event)">
+<form id="tags-form" method=post action="./__id__:save">
+<table cellpadding=0 cellspacing=0><tr><td class="field">
+<input class="tags text" id="tags-field" type=text name=tags size=50
+       value="home, policy" onfocus="focus_tag_form()" onblur="blur_tag_form()">
+</td><td>
+<input type=submit name=submit id="tags-submit" value="save tags">
+</td><td>
+<input type=button id="tags-cancel" value="cancel" onclick="cancel_tag_form()">
+</td></tr></table>
+</form>
+</div>
+</div>
+
+</div>
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+__body__
+</div>
+<script>
+tags_form = $('tags-form');
+tags_field = $('tags-field');
+tags_submit = $('tags-submit');
+tags_cancel = $('tags-cancel');
+tags_menubar = $('tags-menubar');
+</script>

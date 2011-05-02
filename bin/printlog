@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import scrape, time
+
+stamp = '%04d-%02d-%02d %02d:%02d:%02d' % time.localtime()[:6]
+
+s = scrape.Session()
+s.go('http://10.0.0.2/')
+d = s.follow('Supplies Status')
+
+fields = {
+    'black_cartridge': d.find('Black ').next('td').text,
+    'pages_remaining': d.find('Pages Remaining').next('td').text,
+    'pages_printed': d.find('Pages Printed').next('td').text
+}
+
+print ' '.join([stamp] + ['%s=%s' % item for item in fields.items()])

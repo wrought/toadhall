@@ -1,0 +1,333 @@
+"""This module provides utility functions for all the CGI scripts to use.
+This includes functions for reading and storing data in files on disk,
+formatting HTML, and handling dates."""
+
+import cgitb; cgitb.enable()
+import sys, os, re, time
+from os.path import join, getmtime
+from urllib import quote as urlquote
+
+sys.path.append('/web/internal')
+os.chdir('/web/internal')
+
+# ------------------------------------------------------------- file storage
+
+def read_file(filename):
+    """Return a string containing the contents of the specified file."""
+    try:
+        return open(filename).read()
+    except IOError:
+        return ''
+
+def write_file(filename, content):
+    """Overwrite the specified file with the given content."""
+    file = open(filename, 'w')
+    file.write(content)
+    file.close()
+
+def append_file(filename, content):
+    """Append the given content to the specified file."""
+    file = open(filename, 'a')
+    file.write(content)
+    file.close()
+
+def read_lines(filename):
+    """Return a list of strings containing the lines of the specified file,
+    not including the trailing newline, and skipping blank or comment lines."""
+    return [line.rstrip('\n')
+            for line in read_file(filename).split('\n')
+            if line.strip() and not line.startswith('#')]
+
+def write_lines(filename, lines):
+    """Overwrite the specified file with the given lines.  Each item in the
+    list of lines should be a string with no trailing newline."""
+    writefile(filename, '\n'.join(lines) + '\n')
+
+def append_lines(filename, lines):
+    """Append the given lines to the specified file.  Each item in the
+    list of lines should be a string with no trailing newline."""
+    appendfile(filename, '\n'.join(lines) + '\n')
+
+def read_records(filename, separator=',', nfields=0):
+    """Return a list of records, where each record is a list of fields
+    corresponding to a line read from the specified file, split up by the
+    specified separator.  Blank lines and comment lines are skipped."""
+    return [line.split(separator, nfields - 1) for line in read_lines(filename)]
+
+def write_records(filename, records, separator=','):
+    """Overwrite the specified file with the specified list of records."""
+    writelines(filename, [separator.join(record) for record in records])
+
+def append_records(filename, records, separator=','):
+    """Append the given records to the specified file."""
+    appendlines(filename, [separator.join(record) for record in records])
+
+# -------------------------------------------------------------- page output
+
+def redirect(url):
+    print 'Location:', url
+    print
+    sys.exit()
+
+def flatten(stuff):
+    if type(stuff) in (list, tuple):
+        return ''.join(map(flatten, stuff))
+    return str(stuff)
+
+def write(*stuff):
+    sys.stdout.write(flatten(stuff))
+    sys.stdout.flush()
+
+def write_template(filename, **pairs):
+    output = read_file(filename)
+    for key, value in pairs.items():
+        output = output.replace('__' + key + '__', flatten(value))
+    write(output)
+
+# --------------------------------------------------------------------- HTML
+
+_rename = {'pad': 'cellpadding', 'space': 'cellspacing', 'c': 'class'}.get
+def _attrs(d):
+    return ''.join([ ' %s="%s"' % (_rename(k, k).replace('_', ''), d[k])
+                    for k in d if d[k] is not None])
+def _maketag(name, br=''):
+    return lambda *stuff, **attrs: [
+        '<%s%s%s>' % (name, _attrs(attrs), br), stuff, '</%s>' % name, br]
+def curry(tag, **defaults):
+    def result(*stuff, **attrs):
+        dict = defaults.copy()
+        dict.update(attrs)
+        return tag(*stuff, **dict)
+    return result
+
+g = globals()
+for t in 'a span tr th td li strong label textarea'.split(): g[t] = _maketag(t)
+for t in 'h1 h2 div form table ul ol dl dt dd'.split(): g[t] = _maketag(t, '\n')
+
+table = curry(table, pad=0, space=0)
+tablew = curry(table, width='100%')
+tdr = curry(td, align='right')
+trt = curry(tr, valign='top')
+p, hr, br, nbsp = '\n<p>', '<hr>\n', '<br>\n', '&nbsp;'
+
+def input(**attrs): return '<input%s>' % (_attrs(attrs))
+def img(src, **attrs): return '<img src="%s"%s>' % (src, _attrs(attrs))
+def esc(text): return text.replace('&', '&amp;').replace('<', '&lt;')
+def link(url, *contents): return a(contents, href=url)
+
+started = 0 
+def prologue(title, stylesheet=None):
+    global started
+    if started: return
+    started = 1
+    write('Content-Type: text/html; charset=utf-8\n\n')
+    write('''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+              "http://www.w3.org/TR/html4/strict.dtd"><html>''')
+    write('<head><title>' + esc(title) + '</title>\n')
+    if stylesheet:
+        write('<link rel="stylesheet" href="%s">' % stylesheet)
+    write('</head><body>')
+    write(read_file('title.html'))
+
+def epilogue():
+    host = os.environ.get('HTTP_HOST', '10.0.0.1')
+    if re.match(r'^\d+\.\d+\.\d+\.\d+$', host):
+        host = 'kingmanhall.org/internal'
+    url = 'http://' + host + os.environ['SCRIPT_NAME']
+    write('''<div class="footer">
+made with <a href="http://python.org/">Python</a>,
+<a href="http://validator.w3.org/check?uri=%s">HTML</a>,
+<a href="http://jigsaw.w3.org/css-validator/validator?uri=%s">CSS</a>
+</div>''' % (url, url))
+    write('</body></html>')
+
+def multicolumn(items, columns=3, rows=None, **attrs):
+    cells = []
+    if not rows: rows = (len(items) + columns - 1) / columns
+    width = str(100/columns) + '%'
+    cell = []
+    for item in items:
+        cell.append(div(item))
+        if len(cell) == rows:
+            cells.append(td(cell, width=width))
+            cell = []
+    if cell: cells.append(td(cell, width=width))
+    return tablew(trt(cells), **attrs)
+
+# -------------------------------------------------------------------- dates
+
+daynames = 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday'.split()
+monthnames = '''x January February March April May June 
+                July August September October November December'''.split()
+
+class Date:
+    def __init__(self, year, month, day):
+        self.year, self.month, self.day = year, month, day
+        self.time = time.mktime((year, month, day, 0, 0, 0, 0, 0, 0))
+        y, l, d, h, m, s, self.weekday = time.localtime(self.time)[:7]
+
+    def __repr__(self):
+        return '%04d-%02d-%02d' % (self.year, self.month, self.day)
+
+    def __cmp__(self, other):
+        return cmp((self.year, self.month, self.day),
+                   (other.year, other.month, other.day))
+
+    def __add__(self, days):
+        return Date(*time.localtime(self.time + days*24*3600)[:3])
+
+    def __sub__(self, days):
+        return Date(*time.localtime(self.time - days*24*3600)[:3])
+
+    def format(self, format):
+        return format.replace('%yyyy', '%04d' % self.year
+                    ).replace('%y', '%d' % self.year
+                    ).replace('%mmmm', monthnames[self.month]
+                    ).replace('%mmm', monthnames[self.month][:3]
+                    ).replace('%mm', '%02d' % self.month
+                    ).replace('%m', '%d' % self.month
+                    ).replace('%dddd', daynames[self.weekday]
+                    ).replace('%ddd', daynames[self.weekday][:3]
+                    ).replace('%dd', '%02d' % self.day
+                    ).replace('%d', '%d' % self.day)
+
+def get_date(t=None):
+    """Get the current date, or convert a Unix time to a Date object."""
+    return Date(*time.localtime(t or time.time())[:3])
+
+def parse_date(text):
+    """Convert a string in the form 2001-02-03 to a Date object."""
+    return Date(*map(int, text.split()[0].split('-')))
+
+def get_file_date(path):
+    """Get the modification date on a file."""
+    return Date(*time.localtime(getmtime(path))[:3])
+
+# --------------------------------------------------------- events and notes
+
+def format_text(text,
+                bpat=re.compile(r'\*\*([^\t\n*]+)\*\*'),
+                ipat=re.compile(r'([([ ])\*(\S[^*]+\S)\*([]):;,.!? ])'),
+                urlpat=re.compile(r'(https?://([^\s/]+)(\S*[^\s:;,.!?()])?)'),
+                mailpat=re.compile(r'(\w[\w.-]+@[a-z][\w.-]+\.[a-z]{2,3})\b'),
+               ):
+    text = ' ' + esc(text) + ' '
+    text = text.replace('\x92', "'")
+    text = text.replace(' -- ', '&nbsp;&mdash; ')
+    text = bpat.sub(r'<b>\1</b>', text)
+    text = bpat.sub(r'<b>\1</b>', text)
+    text = ipat.sub(r'\1<i>\2</i>\3', text)
+    text = ipat.sub(r'\1<i>\2</i>\3', text)
+    text = urlpat.sub(r'<a href="\1">[\2]</a>', text)
+    text = mailpat.sub(r'<a href="mailto:\1">\1</a>', text)
+    text = text.replace('\t\t', '\n<p>')
+    text = text.replace('\t', '<br>\n')
+    return text
+
+def get_events(file='events.txt'):
+    return [(parse_date(date), title, details)
+            for date, title, details in read_records(file, '\t', 3)]
+
+def format_event(event):
+    date, title, details = event
+    today = get_date()
+    c = 'event'
+    if date < today: c += ' past'
+    if date == today: c += ' today'
+    body = span(title, c='title')
+    if details.strip():
+        body += ': ' + format_text(details)
+    date = date.format('%ddd %d %mmm ')
+    return trt(td(date, c='date'), td(body, c='body'), c=c)
+
+def get_notes(file='notes.txt'):
+    return [(parse_date(date.split()[0]), date.split()[1], name, note)
+            for date, name, note in read_records(file, '\t', 3)]
+
+def format_note(note):
+    date, time, name, text = note
+    body = [span(name, c='author'), ': ', format_text(text)]
+    date = [date.format('%ddd %d %mmm  '), span(time, c='time')]
+    return trt(td(date, c='date'), td(body, c='body'), c='note')
+
+# ------------------------------------------------------------------ members
+
+class Member(dict):
+    def __init__(self, **items):
+        self.update(items)
+
+    def __getitem__(self, key):
+        return self.get(key, '')
+
+def get_member_ids(dir='members'):
+    return [int(file[:-2]) for file in os.listdir(dir) if file.endswith('.m')]
+
+def get_members(dir='members'):
+    return [get_member(id, dir) for id in get_member_ids(dir)]
+
+def get_member(id, dir='members'):
+    member = Member(id=id)
+    for line in open(join(dir, '%d.m' % id)):
+        key, value = line.split(':', 1)
+        member[key] = value.strip()
+    return member
+
+def put_member(new, time, author, dir='members'):
+    id = new['id']
+    old = get_member(id)
+    entries = []
+    fields = []
+    for key in old:
+        value = new.get(key, '')
+        if old[key] != value:
+            entries.append('%d\t%s\t%s: %s\n' % (time, author, key, value))
+    for key in new:
+        if key not in old:
+            entries.append('%d\t%s\t%s: %s\n' % (time, author, key, new[key]))
+        if key != 'id':
+            fields.append('%s: %s\n' % (key, new[key]))
+    file = open(join(dir, '%d.v' % id), 'a')
+    file.write(''.join(entries))
+    file.close()
+    file = open(join(dir, '%d.m' % id), 'w')
+    file.write(''.join(fields))
+    file.close()
+
+def next_member_id(dir='members'):
+    next_id = max([0] + get_member_ids(dir)) + 1
+    file = open(join(dir, '%d.m' % next_id), 'w')
+    file.close()
+    return next_id
+
+# ------------------------------------------------------------------ hotness
+
+def get_hotness(category, file='hotness.txt'):
+    popsizes = {'m': 29.0, 'f': 29.0, 'mf': 58.0}
+    total, count = 0, 0
+    mtotal, mcount = 0, 0
+    ftotal, fcount = 0, 0
+    records = {'m': [], 'f': [], 'mf': []}
+    rows = [line.split()
+            for line in read_lines(file) if not line.startswith('#')]
+    for row in rows:
+        try:
+            time, rcategory, gender, number = row
+            time = int(time)
+            number = float(number)
+            sample = popsizes[gender]
+        except:
+            continue
+        if rcategory == category:
+            records[gender].append(number)
+            total += number/sample
+            count += 1
+            if 'f' in gender:
+                ftotal += number/sample
+                fcount += 1
+            if 'm' in gender:
+                mtotal += number/sample
+                mcount += 1
+    hq = (count and [total/count] or [None])[0]
+    fhq = (fcount and [ftotal/fcount] or [None])[0]
+    mhq = (mcount and [mtotal/mcount] or [None])[0]
+    return records, hq, fhq, mhq

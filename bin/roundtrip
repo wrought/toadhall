@@ -1,0 +1,13 @@
+#!/bin/sh
+
+killall ping 1>/dev/null 2>/dev/null
+day=`date +'%Y-%m-%d'`
+log="/root/pingtimes/$day"
+echo >> $log
+echo -n '==== ' >> $log
+date +'%Y-%m-%d %H:%M:%S %Z' >> $log
+if /root/bin/tping 209.204.144.1 >> $log; then
+    true
+else
+    echo FAIL >> $log
+fi

@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+
+import socket; del socket.ssl # force use of cURL, because it's faster
+import sys, time, keyword
+flush = sys.stdout.flush
+
+from scrape import *
+s.verbose = 1
+
+def getid(element):
+    text = element.text.replace('_', ' ').replace('-', ' ')
+    text = re.sub(r'[^\w\s]', '', element.text)
+    return '_'.join(text.lower().split())
+
+def trystr(text):
+    try:
+        return str(text)
+    except:
+        return text
+
+def nospans(tr):
+    return int(tr.first('td').get('colspan', 1)) == 1
+
+def getrecord(headings, tr):
+    record = {}
+    for heading, td in zip(headings, tr.all('td')):
+        try:
+            heading = str(heading)
+        except:
+            pass
+        try:
+            value = td.number
+        except:
+            value = td.text.strip()
+            try:
+                value = str(value)
+            except:
+                pass
+        if keyword.iskeyword(heading):
+            heading += '_'
+        record[heading] = value
+    return record
+
+def getservices():
+    d = s.go('http://www.pge.com/myhome')
+    b = d.all('form')[1].buttons[0]
+    s.submit(b, USER='kingman', PASSWORD='carb0n', redirects=0)
+    s.go('/csol/actions/login.do?aw')
+    s.follow('Business Tools')
+    d = s.follow(iregex(r'view\s+all\s+\d+\s+services'))
+
+    services = {}
+    while 1:
+        h = d.find(iregex(r'Service\s+ID\s+Number'))
+        rows = filter(nospans, h.enclosing('table').all('tr'))
+        headings = map(getid, rows.pop(0).all('td'))
+        for row in rows:
+            if row.all('a', href=ANY):
+                record = getrecord(headings, row)
+                record['url'] = s.resolve(row.first('a')['href'])
+                services[record['service_id_number']] = record
+        try:
+            d = s.follow(regex(r'NEXT \d+'))
+        except ScrapeError:
+            break
+    return services
+
+def shortrepr(x):
+    if type(x) in [int, long, float]:
+        return str(x)
+    return repr(x)
+
+def dump(d):
+    """Produce a more compact representation of a dictionary, loadable
+    with eval() just by enclosing the text between "dict(" and ")"."""
+    return ', '.join(('%s=%s') % (key, shortrepr(d[key]))
+                     for key in sorted(d.keys()))
+
+call_re = r'(\w+)\s*\('
+def_re = r'function\s+__0__\(.*?{(.*?)}'
+var_re = r'__0__\s*=\s*[\'"](.*?)[\'"]'
+cookielit_re = r'\bdocument.cookie\s*=\s*[\'"](.*?)[\'"]'
+cookievar_re = r'\bdocument.cookie\s*=\s*(\w+)'
+
+def getservice(url):
+    d = s.go(url)
+
+    # It's awful: the billing history link doesn't specify the service ID
+    # in the URL.  It calls a JavaScript function to put the service ID in
+    # a cookie, which the linked page depends on to get the history data.
+    link = d.first('a', content=regex('.*History'))
+    onclick = link.get('onclick', '')
+    if onclick.strip().startswith('javascript:'):
+        match = re.search(call_re, onclick)
+        if match:
+            func = match.group(1)
+            funcdef = s.doc.find(regex(def_re, func)).content
+            match = re.search(cookielit_re, funcdef)
+            if not match:
+                match = re.search(cookievar_re, funcdef)
+                if match:
+                    var = match.group(1)
+                    match = regex(var_re, var).search(funcdef)
+            if match:
+                s.setcookie(match.group(1))
+    d = s.go(link['href'])
+
+    # Customer profile table.
+    profile = {}
+    try:
+        table = d.find(iregex(r'customer\s+profile')).enclosing('table')
+        key = ''
+        for td in table.all('td', colspan=MISSING):
+            if td['class'] == 'dataTable':
+                key = getid(td)
+            if td['class'] == 'dataTableData' and key:
+                profile[trystr(key)] = trystr(td.text.strip())
+    except ScrapeError:
+        pass
+
+    # Billing history table.
+    records = []
+    try:
+        table = d.last('table', content=iregex(r'billing\s+history'))
+        rows = filter(nospans, table.all('tr'))
+        headings = map(getid, rows.pop(0).all('td'))
+        for row in rows:
+            records.append(getrecord(headings, row))
+    except ScrapeError:
+        pass
+    return profile, records
+
+services = getservices()
+for service, record in services.items():
+    print '\n# Service %s (downloaded %04d-%02d-%02dT%02d:%02d:%02dZ)' % (
+        (service,) + time.gmtime()[:6])
+    print dump(record)
+    flush()
+    profile, records = getservice(record['url'])
+    print dump(profile)
+    flush()
+    for record in records:
+        print dump(record)
+        flush()

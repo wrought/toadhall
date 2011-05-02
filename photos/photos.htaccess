@@ -1,0 +1,27 @@
+# This file resides at /web/internal/photos/photos.htaccess so it
+# can be easily backed up with the rest of /web/internal.  It is
+# symlinked over to /web/photos/.htaccess.
+
+# The "deny", "allow", and "order" directives in Apache 2 are
+# horribly confusing.  "Order Allow,Deny" means "deny by default".
+<Files README.txt>
+    Order Allow,Deny
+    Allow from 10
+</Files>
+
+# The CGI scripts for the photos reside in /web/internal/photos,
+# but are accessed at http://kingmanhall.org/photos.
+#
+# This is done for two reasons:
+# (a) http://kingmanhall.org/photos maps directly to /web/photos,
+#     which is world-writable so that people can dump photos there.
+#     So, for security, CGI execution is disabled there.
+# (b) Keeping the CGI files here in /web/internal/photos makes it
+#     easier to back up the scripts (just tar up /web/internal)
+#     separately from the photos.
+Options FollowSymLinks
+RewriteEngine on
+RewriteRule ^/?$ /internal/photos/index.cgi
+RewriteRule ^/?index.cgi$ /internal/photos/index.cgi
+RewriteRule ^/?folder.cgi$ /internal/photos/folder.cgi
+RewriteRule ^/?rotate.cgi$ /internal/photos/rotate.cgi

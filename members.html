@@ -1,0 +1,51 @@
+
+<div class="members">
+
+<p>
+This page is only visible to computers inside Kingman Hall.
+
+<p>
+You can use this page to add or edit contact information for yourself,
+as well as for other members past and present.
+
+<p>
+<form action="members.cgi" method="post">
+<input type="hidden" name="edit" value="1">
+<input type="submit" value="Add a Member">
+</form>
+
+<h2>Current Residents</h2>
+
+<table class="residents">
+<tr>
+<th class="name">Name <span class="sort">(sort by <a href="members.cgi?sort=first">first</a>, <a href="members.cgi?sort=last">last</a>)</span></th>
+<th class="room"><a href="members.cgi?sort=room">Room</a></th>
+<th class="phone">Phone</th>
+<th class="e-mail">E-mail</th>
+</tr>
+__residents__
+</table>
+
+<h2>Current Boarders</h2>
+
+<table class="boarders">
+<tr>
+<th class="name">Name <span class="sort">(sort by <a href="members.cgi?sort=first">first</a>, <a href="members.cgi?sort=last">last</a>)</span></th>
+<th class="phone">Phone</th>
+<th class="e-mail">E-mail</th>
+</tr>
+__boarders__
+</table>
+
+<h2>Past Members</h2>
+
+<table class="oldmembers">
+<tr>
+<th class="name">Name <span class="sort">(sort by <a href="members.cgi?sort=first">first</a>, <a href="members.cgi?sort=last">last</a>)</span></th>
+<th class="phone">Phone</th>
+<th class="e-mail">E-mail</th>
+</tr>
+__oldmembers__
+</table>
+
+</div>

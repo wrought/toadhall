@@ -1,0 +1,18 @@
+# This file lists the manager positions that will be used for the online VOCs.
+# Each line below should have three fields separated by commas:
+# position,compensation,name
+# To specify multiple people for one position, put them on separate lines with
+# the same position and divide up the compensation as appropriate.
+
+House Manager,9/16 rent plus 5 hours/week,Tony
+Kitchen Manager,100% rent plus 5 hours/week,Gaby
+Workshift Manager,9/16 rent plus 5 hours/week,Madelyn
+Maintenance Manager,9/16 rent plus 5 hours/week,Beaver
+Social Manager,2.5 hours/week,Justyna
+Social Manager,2.5 hours/week,Adriana
+President,5 hours/week,Ping
+Vice President,3 hours/week,Brian
+Board Representative,5 hours/week,Kate
+Waste Reduction Manager,5 hours/week,Lisa
+Garden Manager,5 hours/week,Grace
+Network Manager,3 hours/week,Jonathan

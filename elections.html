@@ -1,0 +1,90 @@
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+function update(id) {
+    var n, div;
+    for (n = 1; div = $('namediv-' + n); n++) {
+        div.style.fontWeight = 'normal';
+    }
+    div = $('namediv-' + id);
+    if (div) div.style.fontWeight = 'bold';
+}
+</script>
+
+<div class="elections">
+
+<div class="announcement">The election is closed.</div>
+
+<h1>House Elections</h1>
+
+<div class="form">
+<form action="elections.cgi" method="post">
+<p>
+__members__
+<p>
+Please click on a job title to read the job description
+if you are unsure of what any manager's job entails.
+<p>
+For each manager position, <strong>rank the candidates</strong>
+with 1 for your first choice, 2 for your second, and so on.
+You can rank candidates equally to indicate equal preference.
+
+<p>
+__managers__
+<p>
+Thanks for voting in this election and being a part of this wonderful house!
+<p>
+<!--<input id=submit type=submit name=submit value="Submit your votes">-->
+<input id=submit type=submit name=submit disabled value="The election is closed.">
+<span id=warning class=warning>Only numbers are allowed.</span>
+</form>
+</div>
+
+</div>
+
+<script>
+var isbad = {};
+
+function setbad(input, bad) {
+    if (bad) {
+        isbad[input.id] = 1;
+        input.style.color = '#fff';
+        input.style.background = '#f00';
+    } else {
+        delete isbad[input.id];
+        input.style.color = '#000';
+        input.style.background = '#fff';
+    }
+    $('submit').disabled = false;
+    $('warning').style.visibility = 'hidden';
+    for (var x in isbad) {
+        $('submit').disabled = true;
+        $('warning').style.visibility = 'visible';
+        break;
+    }
+}
+
+function check(input) {
+    setbad(input, !input.value.match(/^ *[0-9]* *$/));
+}
+
+function normalize(event) {
+    var input = event.target;
+    var value = parseInt(input.value);
+    if (value > 99) value = NaN;
+    if (!(input.id in isbad)) {
+        input.value = isNaN(value) ? '' : value;
+    }
+}
+
+var inputs = document.getElementsByTagName('input');
+for (var i = 0; i < inputs.length; i++) {
+    var input = inputs.item(i);
+    if (input.getAttribute('type') == 'text') {
+        input.setAttribute('oninput', 'check(this)');
+        input.onchange = normalize;
+    }
+}
+</script>

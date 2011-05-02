@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Administration Area"
+AuthUserFile /web/internal/admin/passwd
+Require valid-user

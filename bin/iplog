@@ -1,0 +1,4 @@
+#!/bin/sh
+
+file=$1
+/usr/sbin/tcpdump -q -n -i eth0 > $file

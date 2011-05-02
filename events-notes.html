@@ -1,0 +1,169 @@
+<table width="100%" cellspacing="0" cellpadding="0" id="events-notes">
+<tr valign="top"><td id="events-cell">
+<div id="events">
+
+<div id="event-add">
+<!-- Turn off display in JavaScript, not CSS, so that the interface -->
+<!-- degrades gracefully in browsers with CSS but without scripting. -->
+<script>document.getElementById('event-add').style.display='none';</script>
+<div class="heading">
+<h2>Add an Event</h2>
+<ul class="links">
+<li><a href="" onclick="cancel_event(); return false">cancel</a></li></ul>
+</div>
+
+<div class="content">
+__event_preview__
+<form action="go.cgi" method="post">
+<table cellpadding="0" cellspacing="0" class="form">
+<tr><td class="label required">Date:</td>
+<td><select name="month">
+__month_options__
+</select>
+<select name="day">
+__day_options__
+</select></td></tr>
+<tr><td class="label required">Title:</td>
+<td>
+<input type="text" name="title" value="__title__" size="36" id="event-title">
+</td></tr>
+<tr class="label-row"><td class="label">Details:</td>
+<td><textarea rows="4" cols="36" name="details">__details__</textarea></td></tr>
+<tr><td></td><td class="label">See <a href="kwiki/kwiki_help">help</a>
+for instructions on formatting.</td></tr>
+<tr class="buttons"><td colspan="2">
+<input type=hidden name=object value="event">
+<input type="submit" name="action" value="preview">
+<input type="submit" name="action" value="add an event">
+</td></tr>
+</table>
+</form>
+</div>
+</div>
+
+<div class="heading">
+<h2>Upcoming</h2>
+<ul class="links" id="event-link">
+<li><a href="" onclick="add_event(1); return false">add an event</a></li></ul>
+</div>
+
+<div class="content events">
+__upcoming__
+</div>
+
+<div class="heading">
+<h2>Recent</h2>
+</div>
+
+<div class="content events">
+__recent__
+</div>
+
+<div class="label required"><p>Hey, where did the form go?</div>
+<div class="label">
+It's up at the top now!  Click "add an event" to make it appear.</div>
+</div>
+
+</td><td id="notes-cell">
+
+<div id="notes">
+
+<div id="note-add">
+<script>document.getElementById('note-add').style.display='none';</script>
+<div class="heading">
+<h2>Add a Note</h2>
+<ul class="links">
+<li><a href="" onclick="cancel_note(); return false">cancel</a></li></ul>
+</div>
+
+<div class="content">
+__note_preview__
+<form action="go.cgi" method="post">
+<table cellpadding="0" cellspacing="0" class="form">
+<tr><td class="label required">Your name:</td>
+<td>
+<input type="text" name="name" value="__name__" size="36" id="note-name">
+</td></tr>
+<tr class="label-row"><td class="label required">Note:</td>
+<td><textarea rows="4" cols="36" name="note">__note__</textarea></td></tr>
+<tr><td></td><td class="label">See <a href="kwiki/kwiki_help">help</a>
+for instructions on formatting.</td></tr>
+<tr class="buttons"><td colspan="2">
+<input type=hidden name=object value="note">
+<input type=submit name=action value="preview">
+<input type=submit name=action value="post a note">
+<input type=submit name=action value="ask the house a kwestion">
+</td></tr>
+</table>
+</form>
+</div>
+</div>
+
+<div class="heading">
+<h2>Notes</h2>
+<ul class="links" id="note-link">
+<li><a href="" onclick="add_note(1); return false">add a note</a></li></ul>
+</div>
+
+<div class="content">
+__notes__
+</div>
+
+<div class="label required"><p>Hey, where did the form go?</div>
+<div class="label">
+It's up at the top now!  Click "add a note" to make it appear.</div>
+
+</div>
+
+</td></tr></table>
+
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+// Experiment with various animation timing curves.
+// var steps = [0.25, 0.5, 0.7, 0.85, 0.95, 1.0];
+// var steps = [0.37, 0.61, 0.79, 0.91, 0.97, 1.0];
+
+// This seems to look pretty good (quick ease-in, gentle ease-out).
+// var steps = [0.21, 0.55, 0.79, 0.91, 0.97, 1.0];
+var steps = [0.20, 0.55, 0.80, 0.95, 1.0], dt = 50;
+
+function expand(step, id, target) {
+    if (step >= steps.length) return $(id).style.height = '';
+    $(id).style.height = Math.round(steps[step]*target) + 'px';
+    setTimeout('expand(' + (step + 1) + ", '" + id + "', " + target + ')', dt);
+}
+
+function add_note(animate) {
+    $('note-add').style.display = 'block';
+    var height = $('note-add').offsetHeight;
+    if (animate) $('note-add').style.height = '0px';
+    $('note-link').style.display = 'none';
+    $('note-name').focus();
+    if (animate) setTimeout("expand(0, 'note-add', " + height + ')', dt);
+}
+
+function cancel_note() {
+    $('note-add').style.display = 'none';
+    $('note-link').style.display = 'inline';
+}
+
+function add_event(animate) {
+    $('event-add').style.display = 'block';
+    var height = $('event-add').offsetHeight;
+    if (animate) $('event-add').style.height = '0px';
+    $('event-link').style.display = 'none';
+    $('event-title').focus();
+    if (animate) setTimeout("expand(0, 'event-add', " + height + ')', dt);
+}
+
+function cancel_event() {
+    $('event-add').style.display = 'none';
+    $('event-link').style.display = 'inline';
+}
+
+if ($('note-name').value) add_note();
+if ($('event-title').value) add_event();
+</script>

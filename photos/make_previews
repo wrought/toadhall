@@ -1,0 +1,58 @@
+#!/usr/bin/python -S
+
+import sys, os, time, exif
+hook = sys.excepthook
+sys.path.append('/web/internal')
+from utils import *
+from rotation import *
+sys.excepthook = hook
+
+def update_preview(path):
+    temp = '/tmp/temp-%d.jpg' % os.getpid()
+    dir, filename = os.path.split(path)
+    preview = join(dir, join('preview', filename))
+    if not exists(preview) or getmtime(path) > getmtime(preview):
+        print 'update: %s' % preview
+        mkdir(dirname(preview))
+        remove(preview)
+        return make_preview(path, 200, preview)
+
+def process_dir(dir, quit_time=None):
+    os.chmod(dir, 0777)
+    try:
+        for filename in sorted(os.listdir(dir)):
+            path = join(dir, filename)
+            if quit_time and time.time() > quit_time:
+                print 'time expired:', time.asctime()
+                sys.exit()
+            if filename.lower().endswith('.jpg') and filename[0] != '.':
+                if os.path.getsize(path) == 0:
+                    print 'removed empty file:', path
+                    remove(path)
+                    continue
+                rotated = join(dir, 'rotated', filename)
+                if update_preview(path):
+                    orient = get_orient(path)
+                    if orient != 1 and not exists(rotated):
+                        print 'rotate %d: %s' % (orient, path)
+                        mkdir(dirname(rotated))
+                        remove(rotated)
+                        rotate_image(path, transform(orient, 1), rotated)
+                if isfile(rotated):
+                    update_preview(rotated)
+    except InterruptedError:
+        print 'interrupted:', time.asctime()
+        sys.exit()
+
+print 'start:', time.asctime()
+quit_time = None
+if sys.argv[1:]:
+    quit_time = time.time() + int(sys.argv[1])
+    print 'limit:', time.asctime(time.localtime(quit_time))
+for filename in reversed(sorted(os.listdir('/web/photos'))):
+    os.chdir('/web/photos')
+    if os.path.isdir(filename):
+        stripped = filename.strip()
+        if stripped[4:5] + stripped[7:8] + stripped[10:11] == '-- ':
+            process_dir('/web/photos/' + filename, quit_time)
+print 'finished:', time.asctime()

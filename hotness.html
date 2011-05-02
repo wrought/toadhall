@@ -1,0 +1,160 @@
+<script>
+function highlightMembers() {
+    var object = document.getElementById('object').value;
+    var members = document.getElementsByTagName('div');
+    for (var i = 0; i < members.length; i++) {
+        var classes = members[i].className.split(' ');
+        if (classes.length >= 2 && classes[1] == 'member') {
+            members[i].className = classes[0] + ' member' + (
+                object.match(classes[0]) ? ' selected' : ' deselected');
+        }
+    }
+}
+</script>
+
+<div class="hotness">
+
+<h1>What is Kingman's Hotness Quotient?</h1>
+
+<p>According to this highly controlled scientific study,
+if you are a Kingmanite,
+__hq__ of the house would totally do you, and __mk__ would totally make out with you.
+More specifically:
+<ul>
+If you're female, __fhq__ of a random sample of Kingmanites (__ffhq__ of the women and __mfhq__ of the men) would totally do you.<br>
+If you're female, __fmk__ of a random sample of Kingmanites (__ffmk__ of the women and __mfmk__ of the men) would totally make out with you.<br>
+If you're male, __mhq__ of a random sample of Kingmanites (__fmhq__ of the women and __mmhq__ of the men) would totally do you.<br>
+If you're male, __mmk__ of a random sample of Kingmanites (__fmmk__ of the women and __mmmk__ of the men) would totally make out with you.
+</ul>
+
+<p>__n__ people have submitted answers to this survey so far.
+<p>
+
+<div class="form">
+<form action="hotness.cgi" method="post">
+<h2>Hotness Quotient for FALL 2009!</h2>
+<p>
+I'm 
+<select name=subject>
+<option value="">(choose)</option>
+<option value=f>female</option>
+<option value=m>male</option>
+</select>,
+I'm attracted to
+<select id=object name=object onchange="highlightMembers()">
+<option value="">(choose)</option>
+<option value=f>women</option>
+<option value=m>men</option>
+<option value=mf>both</option>
+</select>
+and
+I would totally do
+<input name=number type=text size=3>
+of my housemates.
+<br>
+I'm attracted to the lips of 
+<select id=object name=smoochable onchange="highlightMembers()">
+<option value="">(choose)</option>
+<option value=f>women</option>
+<option value=m>men</option>
+<option value=mf>both</option>
+</select>
+and
+I would totally make out with
+<input name=makeout type=text size=3>
+of my housemates.
+<p>
+<!-- <input name=button type=button disabled value="The survey is not yet open."> -->
+<input name=submit type=submit value="Submit your answer.">
+<!-- <input name=button type=button disabled value="The survey has ended."> -->
+
+</form>
+</div>
+
+<p>
+For reference, here's a house list:
+
+<table cellpadding=0 cellspacing=0 border=0 class="house-list">
+<tr>
+<th>First Floor</th>
+<th colspan=2>Second Floor</th>
+<th colspan=2>Third Floor</th>
+<th colspan=2>Boarders</th></tr>
+<tr>
+<td>
+<div class="f member deselected">1A Barbara</div>
+<div class="m member deselected">1B Jeremy</div>
+<div class="m member deselected">1C Ben A</div>
+<div class="m member deselected">1D Pedro</div>
+<div class="f member deselected">1E Eve</div>
+<div class="m member deselected">1F Steven</div>
+<div class="f member deselected">1F Angelica</div>
+<div class="m member deselected">1G Jamie</div>
+<div class="m member deselected">1G Narayan</div>
+<div class="f member deselected">1H Lanette</div>
+<div class="f member deselected">1H Amy</div>
+</td><td>
+<div class="f member deselected">2A Elaina</div>
+<div class="f member deselected">2A Natalie</div>
+<div class="m member deselected">2B John G.</div>
+<div class="f member deselected">2B Abi</div>
+<div class="m member deselected">2C Tyler</div>
+<div class="m member deselected">2C Matt</div>
+<div class="m member deselected">2D Will</div>
+<div class="m member deselected">2D Josh</div>
+<div class="f member deselected">2E Zoe</div>
+<div class="f member deselected">2E Sara Rose</div>
+<div class="f member deselected">2E Hilary</div>
+</td><td>
+<div class="f member deselected">2F Claire</div>
+<div class="m member deselected">2G Morgan</div>
+<div class="m member deselected">2H Mikie</div>
+<div class="f member deselected">2I Vickie</div>
+<div class="f member deselected">2I Brie</div>
+<div class="f member deselected">2J Nicola</div>
+<div class="f member deselected">2J Emma</div>
+<div class="m member deselected">2K Brandon</div>
+<div class="m member deselected">2K Spencer</div>
+<div class="f member deselected">2L Nitzan</div>
+<div class="f member deselected">2L Kate</div>
+</td><td>
+<div class="f member deselected">3A Caitlyn</div>
+<div class="m member deselected">3B Jordan</div>
+<div class="m member deselected">3B Justin</div>
+<div class="m member deselected">3C Ben K</div>
+<div class="m member deselected">3C John A</div>
+<div class="f member deselected">3D Sara</div>
+<div class="f member deselected">3D Shirin</div>
+<div class="m member deselected">3E Andrew</div>
+<div class="m member deselected">3E Genta</div>
+<div class="f member deselected">3F Lindsay</div>
+<div class="f member deselected">3F Stephanie</div>
+</td><td>
+<div class="m member deselected">3G Emory</div>
+<div class="f member deselected">3H Catherine</div>
+<div class="m member deselected">3I Kosta</div>
+<div class="m member deselected">3J David</div>
+<div class="m member deselected">3J Nate</div>
+</td><td>
+<div class="f member deselected">Madelyn</div>
+<div class="f member deselected">Jenn</div>
+<div class="m member deselected">Raf</div>
+<div class="m member deselected">Chris</div>
+<div class="f member deselected">Shannon</div>
+<div class="m member deselected">Galen</div>
+<div class="m member deselected">Ryan</div>
+<div class="m member deselected">Alana</div>
+<div class="f member deselected">Hava</div>
+<div class="m member deselected">Rohit</div>
+</td><td>
+</td>
+</tr></table>
+
+<p>
+(This page is only visible to computers inside Kingman Hall.)
+
+</div>
+
+<script>
+highlightMembers();
+</script>

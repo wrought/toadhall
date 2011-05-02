@@ -1,0 +1,63 @@
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+function update(id) {
+    var n, div;
+    for (n = 1; div = $('namediv-' + n); n++) {
+        div.style.fontWeight = 'normal';
+    }
+    div = $('namediv-' + id);
+    if (div) div.style.fontWeight = 'bold';
+
+    for (n = 1; div = $('votediv-' + n); n++) {
+        div.className = id ? 'enabled' : 'disabled';
+        $('vote-' + n).disabled = (!id);
+        if (!id) $('vote-' + n).checked = false;
+    }
+}
+</script>
+
+<div class="vocs">
+
+<h1>Votes of Confidence</h1>
+
+<p>If you prefer, you can also submit your VOC on paper.
+Pick one up near the door of room 3H, write your name on it,
+and put it in the envelope by room 3H when you're done.
+To preserve your anonymity, you can tear off your name,
+then put both pieces of paper in the envelope.
+
+<p>You can only vote once,
+but you can always come back to this page to add more comments.
+
+<p>This is the <strong>SECOND of TWO</strong>
+votes of confidence for this semester.
+This is Kingman's system of manager evaluation.
+The comments you write here will be collected
+and posted <strong>anonymously</strong> for the house to peruse.
+If more than 1/3 of the house votes to give a manager
+80% of their compensation, a recall vote will be held.
+
+<div class="form">
+<form action="vocs.cgi" method="post">
+<p>
+__members__
+<p>
+Please click on a job title to read the job description
+if you are unsure of what any manager's job entails.
+For each manager, <strong>select your choice</strong>
+and <strong>write your comments</strong> in the space provided.
+<strong>Be honest, but be constructive</strong> in your comments.
+
+<p>
+__managers__
+<p>
+Thanks for completing these VOCs and for being a part of this wonderful house!
+<p>
+<input type=submit name=submit value="Submit your answers">
+</form>
+</div>
+
+</div>

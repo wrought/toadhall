@@ -1,0 +1,129 @@
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+function empty(object) {
+    for (var key in object) return 0;
+    return 1;
+}
+function sorted_keys(object) {
+    var array = [];
+    for (var key in object) array.push(key);
+    array.sort();
+    return array;
+}
+function find_child(node, tag, cls) {
+    if (node.nodeName == tag && (!cls || node.className == cls)) return node;
+    var hit;
+    if (node.firstChild) hit = find_child(node.firstChild, tag, cls);
+    if (hit) return hit;
+    if (node.nextSibling) hit = find_child(node.nextSibling, tag, cls);
+    if (hit) return hit;
+}
+function keypress(e) {
+    var keycode = window.event ? event.keyCode : e.keyCode;
+    var escape = window.event ? 27 : e.DOM_VK_ESCAPE;
+    if (keycode == escape) {
+        $('key').value = '';
+        update();
+    }
+}
+var page_tags = {
+    __page_tags__
+};
+function update() {
+    $('top-hit').value = '';
+    var hidden = $('hidden').checked;
+    var retired = $('retired').checked;
+    var keys = $('key').value.toLowerCase().split(/\s+/);
+    var first = 1;
+    for (var tr = find_child($('pages'), 'TR'); tr; tr = tr.nextSibling) {
+        if (tr.nodeName == 'TR' && tr.id) {
+            var id = tr.id.replace('page-', '');
+            var tags = page_tags[id];
+            var show = 1, hit_tags = {};
+            for (var j = 0; j < tags.length; j++) {
+                if (tags[j] == 'hidden') {
+                    if (hidden) hit_tags['hidden'] = 1;
+                    else show = 0;
+                }
+                if (tags[j] == 'retired') {
+                    if (retired) hit_tags['retired'] = 1;
+                    else show = 0;
+                }
+            }
+            for (var i = 0; show && i < keys.length; i++) {
+                if (id.search(keys[i]) < 0) {
+                    var hit = 0;
+                    for (var j = 0; !hit && j < tags.length; j++) {
+                        if (tags[j].search(keys[i]) > -1) {
+                            hit = hit_tags[tags[j]] = 1;
+                        }
+                    }
+                    if (!hit) show = 0;
+                }
+            }
+            tr.style.display = show ? '' : 'none';
+            var span = find_child(tr, 'SPAN', 'tags');
+            while (span.firstChild) span.removeChild(span.firstChild);
+            if (!empty(hit_tags)) span.appendChild(document.createTextNode(
+                '(' + sorted_keys(hit_tags).join(', ') + ')'));
+            if (show && !$('top-hit').value) $('top-hit').value = id;
+        }
+    }
+}
+function add_tag(tag) {
+    $('key').value = tag + ' ';
+    update();
+    return false;
+}
+</script>
+<div class="wiki" id="wiki">
+<div class="meta">
+<a href="./kwiki_help" title="Get help on how to use the Kwiki."
+>help</a> &middot;
+<a href="kwiki/:new" title="Start a new page.">create page</a>
+</div>
+<h1>Welcome to the Kwiki!</h1>
+
+<p>Anyone can make or edit Kwiki pages.
+Look here to find answers to your questions,
+and contribute your own wisdom for present and future Kingmanites.
+You can use Kwiki pages
+for recipes, advice, how-tos, collecting suggestions,
+hashing out proposals before bringing them to house meetings,
+and probably lots of other things I haven't thought of.
+Go to town!
+
+<p>In addition to a title, each page has a list of tags that you can edit.
+Using the tags, you can organize the pages into groups
+and quickly see the list of pages in each group.
+
+<form>
+<div class="label">Find in titles and tags:</div>
+<input id="top-hit" type="hidden" name="page">
+<input id="key" type="text" size=20 name=key value="__key__"
+       onkeypress="keypress(event)" oninput="update()"
+>&nbsp;&nbsp;<input type=button onclick="$('key').value=''; update()" value="clear"
+>&nbsp;<input type=submit name="action" value="go to top match"
+>&nbsp;<input type=submit name="action" value="search all page text"
+>&nbsp;<input type=submit name="action" value="create a new page">
+<div class="filter-options">
+<input type=checkbox id="hidden" onchange="update()"><label for="hidden">include hidden pages</label>&nbsp;
+<input type=checkbox id="retired" onchange="update()"><label for="retired">include retired pages</label>
+</div>
+</form>
+
+<p>
+<div class="tag-list">__tag_list__
+<table class="legend"><tr><td class="hour-old">edited in the last hour</td></tr>
+<tr><td class="day-old">edited in the last day</td></tr></table>
+</div>
+
+__pages__
+
+</div>
+<script>
+$('key').focus();
+update();
+</script>

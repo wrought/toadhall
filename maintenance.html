@@ -1,0 +1,72 @@
+<p>View maintenance notes from:
+<a href="maintenance.cgi?year=2004">2004</a> |
+<a href="maintenance.cgi?year=2005">2005</a> |
+<a href="maintenance.cgi?year=2006">2006</a> |
+<a href="maintenance.cgi">2007</a>
+
+<script>
+var disabled = false;
+</script>
+
+<p>
+<div class="heading">
+<h2>Maintenance Board</h2>
+</div>
+
+<div class="content">
+
+<form method="post">
+
+<div id="notediv">
+To post a maintenance request, fill in your name and a note below.
+
+<table cellpadding="0" cellspacing="0" class="form" id="noteform">
+<tr><td class="label">Name:</td>
+<td><input type="text" name="name" size="25" /></td></tr>
+<tr><td class="label textarealabel">Note:</td>
+<td><textarea rows="5" cols="40" name="note"></textarea></td></tr>
+<tr><td colspan="2">
+<input type="submit" name="action" value="post note" />
+</td></tr>
+</table>
+
+<hr>
+</div>
+
+__notes__
+</form>
+</div>
+
+<script>
+var selector = null;
+var notediv = document.getElementById('notediv');
+var noteform = null;
+
+function movenote() {
+    if (selector) selector.style.display = 'block';
+    if (!noteform) {
+        noteform = document.getElementById('noteform').cloneNode(true);
+    }
+    var div = this.parentNode;
+    var cell = div.parentNode;
+    selector = div;
+    selector.style.display = 'none';
+    cell.appendChild(noteform);
+}
+
+function setup() {
+    if (disabled) {
+        notediv.style.display = 'none';
+    } else {
+        var inputs = document.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length; i++) {
+            var input = inputs.item(i);
+            if (input.getAttribute('name') == 'id') {
+                input.onclick = movenote;
+            }
+        }
+    }
+}
+
+setup();
+</script>

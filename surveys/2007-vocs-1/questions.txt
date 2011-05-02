@@ -1,0 +1,139 @@
+If you prefer, you can also submit your VOC on paper.
+Pick one up near the door of room 3H, write your name on it,
+and put it in the envelope by room 3H when you're done.
+To preserve your anonymity, you can tear off your name,
+then put both pieces of paper in the envelope.
+
+
+You can only vote once, but you can always come back to this
+page to add more comments.
+
+
+This is the <b>SECOND of TWO</b> votes of confidence for
+this semester.  This is Kingman's system of manager
+evaluation.  The comments you write here will be collected
+and posted anonymously for the house to peruse.
+If more than 1/3 of the house votes to give a manager
+80% of their compensation, a recall vote will be held. 
+
+
+<div class="members">
+Choose your name from this list:
+
+[members] 
+</div>
+
+
+Please click on a job title to read the job description
+if you are unsure of what any manager's job entails.
+For each manager, <b>select your choice</b> and
+<b>write your comments</b> in the space provided.
+<b>Be honest, but be constructive</b> in your comments.
+
+
+[title] Tony (House Manager, 9/16 rent plus 5 hours/week)
+    House Manager compensation is 9/16 rent plus 5 hours/week.
+
+    <b>Tony</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Gaby (Kitchen Manager, 100% rent plus 5 hours/week)
+    Kitchen Manager compensation is 100% rent plus 5 hours/week.
+
+    <b>Gaby</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Madelyn (Workshift Manager, 9/16 rent plus 5 hours/week)
+    Workshift Manager compensation is 9/16 rent plus 5 hours/week.
+
+    <b>Madelyn</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Beaver (Maintenance Manager, 9/16 rent plus 5 hours/week)
+    Maintenance Manager compensation is 9/16 rent plus 5 hours/week.
+
+    <b>Beaver</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Kate (Board Representative, 5 hours/week)
+    Board Representative compensation is 5 hours/week.
+
+    <b>Kate</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Ping (President, 5 hours/week)
+    President compensation is 5 hours/week.
+
+    <b>Ping</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Brian (Vice President, 3 hours/week)
+    Vice President compensation is 3 hours/week.
+
+    <b>Brian</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Justyna (Social Manager, 2.5 hours/week)
+    Social Manager compensation is 2.5 hours/week.
+
+    <b>Justyna</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Adriana (Social Manager, 2.5 hours/week)
+    Social Manager compensation is 2.5 hours/week.
+
+    <b>Adriana</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Social Managers (together)
+    Comments for the social managers together:
+    [comments]
+
+
+[title] Lisa (Waste Reduction Manager, 5 hours/week)
+    Waste Reduction Manager compensation is 5 hours/week.
+
+    <b>Lisa</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Grace (Garden Manager, 5 hours/week)
+    Garden Manager compensation is 5 hours/week.
+
+    <b>Grace</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+[title] Jonathan (Network Manager, 3 hours/week)
+    Network Manager compensation is 3 hours/week.
+
+    <b>Jonathan</b> deserves this much of the comp:
+    [options] 80% 90% 100% 110% Abstain
+    [comments]
+
+
+Thanks for completing these VOCs and for being a part
+of this wonderful house!
+
+
+[submit]

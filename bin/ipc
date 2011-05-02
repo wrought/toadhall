@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/sbin/ipchains -nL input
+/sbin/ipchains -nL forward
+/sbin/ipchains -nL local
+/sbin/ipchains -nL output
+/sbin/ipchains -nL hog

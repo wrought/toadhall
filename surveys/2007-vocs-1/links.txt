@@ -1,0 +1,11 @@
+House Manager -> duties.html#house
+Kitchen Manager -> duties.html#kitchen
+Workshift Manager -> duties.html#workshift
+Maintenance Manager -> duties.html#maintenance
+Board Representative -> duties.html#board
+President -> duties.html#president
+Vice President -> duties.html#vice
+Social Manager -> duties.html#social
+Waste Reduction Manager -> duties.html#waste
+Garden Manager -> duties.html#garden
+Network Manager -> duties.html#network

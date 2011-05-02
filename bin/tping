@@ -1,0 +1,26 @@
+#!/bin/sh
+
+tmp=/tmp/tping.$$
+echo "#!/bin/sh" > $tmp.sh
+echo "if ping -c 5 $1; then touch $tmp.ok; fi" > $tmp.sh
+chmod 755 $tmp.sh
+$tmp.sh 2>/dev/null &
+pid=$!
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+if [ ! -f $tmp.ok ]; then sleep 1; fi
+rm -f $tmp.sh
+if [ -f $tmp.ok ]; then
+    rm -f $tmp.ok
+    exit 0
+else
+    kill $pid 2>/dev/null
+    exit 1
+fi

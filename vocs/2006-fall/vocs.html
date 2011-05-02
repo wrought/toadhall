@@ -1,0 +1,63 @@
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+
+function update(id) {
+    var n, div;
+    for (n = 1; div = $('namediv-' + n); n++) {
+        div.style.fontWeight = 'normal';
+    }
+    div = $('namediv-' + id);
+    if (div) div.style.fontWeight = 'bold';
+
+    for (n = 1; div = $('compdiv-' + n); n++) {
+        div.className = id ? 'enabled' : 'disabled';
+        $('comp-' + n).disabled = (!id);
+        if (!id) $('comp-' + n).checked = false;
+    }
+}
+</script>
+
+<div class="vocs">
+
+<h1>Votes of Confidence</h1>
+
+<div class="deadline">
+<strong>PLEASE DO THIS RIGHT NOW!</strong>
+</div>
+
+<p>
+I apologize for the short notice.
+
+<p>This is the <strong>second of two</strong>
+votes of confidence for this semester.
+This is Kingman's system of manager evaluation.
+The comments you write here will be collected anonymously
+and posted for the house to peruse.
+If more than 1/3 of the house votes to give a manager
+80% of their compensation, a recall vote must be held.
+
+<div class="form">
+<form action="vocs.cgi" method="post">
+<p>
+__members__
+<p>
+Please read the "Officers' Duties" in the bylaws on the mail shelf
+if you are unsure of what any manager's job entails.
+For each manager, <strong>select your choice</strong>
+and <strong>write constructive comments</strong> in the space provided.
+<p>
+(If you're in a hurry, you can just vote for compensation for now
+and come back later to add your comments.)
+
+<p>
+__managers__
+<p>
+Thanks for completing these VOCs and for being a part of this wonderful house!
+<p>
+<input type=submit name=submit value="Submit your answers">
+</form>
+</div>
+
+</div>

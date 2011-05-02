@@ -1,0 +1,39 @@
+<div class="wiki edit" id="wiki">
+<div class="meta" id="meta">
+<a href="./kwiki_help">help</a> &middot;
+<a href=".">index</a> &middot;
+<a href="__id__">view</a> &middot;
+<span class="current">edit</span> &middot;
+<a href="./__id__:history">history</a>
+</div>
+
+<h1>Edit &#8220;__title__&#8221;</h1>
+<div class="heading">
+<h2>Preview (not yet saved)</h2>
+</div>
+<div class="preview">
+<h1 class="title">__title__</h1>
+<div class="tags">__tags__</div>
+__preview__
+</div>
+<form method=post action="./__id__:save">
+<div class="label">Title:</div>
+<input class="title text" type=text size=40 name=title value="__title__">
+<div class="label">Tags:</div>
+<input class="tags text" type=text size=60 name=tags value="__tags__">
+<div class="label required">Content (see <a href="kwiki_help">help</a> for instructions on formatting):</div>
+<textarea class="body" name=body rows=20 cols=60>
+__body__
+</textarea>
+<table class="summary" width="100%"><tr><td>
+<div class="label required">Name:</div>
+<input class="text" type=text size=15 name=name value="__name__">
+</td><td>&nbsp;&nbsp;&nbsp;</td><td>
+<div class="label">Describe your change:</div>
+<input class="text" type=text size=60 name=note value="__note__">
+</td></tr></table>
+<div class="actions">
+<input type=submit name=preview value="preview">
+<input type=submit name=submit value="save page">
+</div>
+</div>

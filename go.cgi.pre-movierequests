@@ -1,0 +1,108 @@
+#!/usr/bin/python
+
+from utils import *
+from fastcgi import form, form_encode, request
+import os, time, re; local = time.localtime()
+
+def abort(message):
+    print 'Content-Type: text/plain\n\n' + message
+    raise SystemExit
+
+url, key, addr, city = form.url, form.key, form.addr, form.city
+query = action = ''
+if form.action:
+    action = form.action.lower().split()[0]
+else:
+    if form.url: action = 'url'
+    if form.key: action = 'google'
+if ',' not in city: city += ', CA'
+
+if not url:
+    url = os.path.dirname(request) + '/'
+
+if action == 'url':
+    if '.' not in url: url += '.com'
+    if re.match('http:// *[a-z]+://', url): url = url[7:].strip()
+    if not re.match('[a-z]+://', url): url = 'http://' + url
+elif action == 'google':
+    url = 'http://google.com/search'
+    query = form_encode(q=key)
+elif action == 'dictionary':
+    # url = 'http://dictionary.com/cgi-bin/dict.pl'
+    # query = pairs(term=q)
+    # url = 'http://www.m-w.com/cgi-bin/dictionary'
+    # query = form_encode(va=key, book='Dictionary')
+    url = 'http://www.answers.com/main/ntquery'
+    query = form_encode(s=key)
+elif action == 'thesaurus':
+    url = 'http://www.m-w.com/cgi-bin/thesaurus'
+    query = form_encode(va=key, book='Thesaurus')
+elif action == 'recipes':
+    # url = 'http://www.epicurious.com/s97is.vts'
+    # query = form_encode(action='filtersearch', filter='recipe-filter.hts',
+    #                    collection='Recipes', queryType='and',
+    #                    ResultTemplate='recipe-results.hts', keyword=key)
+    url = 'http://www.epicurious.com/recipes/find/results'
+    query = form_encode(search=key)
+elif action == 'yellow':
+    # url = 'http://yp.yahoo.com/py/ypResults.py'
+    # query = form_encode(stx=key, stp='a', tab='B2C',
+    #                    city='Berkeley', state='CA', zip='94709', country='us',
+    #                    slt='37.867199', sln='-122.259300', cs='5')
+    url = 'http://www.google.com/local'
+    query = form_encode(q=key, near='Berkeley, CA 94709')
+elif action == 'movies':
+    # url = 'http://imdb.com/Find'
+    # query = form_encode(select='All', For=key)
+    url = 'http://imdb.com/find'
+    query = form_encode(q=key, s='all')
+elif action == 'map':
+    # url = 'http://maps.lycos.com/mapresults.asp'
+    # query = [('AD2', q), ('AD3', city), ('AD4', 'USA')]
+    # url = 'http://maps.yahoo.com/py/maps.py'
+    # query = form_encode(Pyt='Tmap', addr=addr, csz=city, Country='us')
+    url = 'http://maps.google.com/maps'
+    query = form_encode(q=addr + ', ' + city)
+elif action == 'directions':
+    # url = 'http://maps.lycos.com/directions.asp'
+    # query = [('OAD2', '1730 La Loma Avenue'), ('OAD3', 'Berkeley, CA'),
+    #          ('DAD2', q), ('DAD3', city)]
+    # url = 'http://maps.yahoo.com/py/ddResults.py'
+    # query = form_encode(Pyt='Tmap', newaddr='1730 La Loma Avenue',
+    #                    newcsz='Berkeley, CA', newcountry='us',
+    #                    newtaddr=addr, newtcsz=city, newtcountry='us')
+    url = 'http://maps.google.com/maps'
+    query = form_encode(q='1730 La Loma Avenue, Berkeley, CA to ' +
+                         addr + ', ' + city)
+elif action == 'add':
+    if not form.title.strip(): abort("You didn't enter an event title.")
+    if not form.month.strip() or not form.day.strip():
+        abort("You didn't choose a date.")
+    file = open('/web/internal/events.txt', 'a')
+    note = form.details.replace('\r\n', '\n').replace('\n\n', '\x01')
+    note = ' '.join(note.split()).replace('\x01', '\t')
+    file.write('%04d-%02d-%02d\t%s\t%s\n' %
+               (local[0], int(form.month), int(form.day),
+                ' '.join(form.title.split()), note))
+    file.close()
+elif action == 'post':
+    if not form.name.strip(): abort("You didn't enter your name.")
+    if not form.note.strip(): abort("You didn't enter a note.")
+    note = form.note.replace('\r\n', '\n').replace('\n', '\x01')
+    note = ' '.join(note.split()).replace('\x01', '\t')
+    line = '%04d-%02d-%02d %02d:%02d\t%s\t%s\n' % (
+        local[:5] + (' '.join(form.name.split()), note))
+    if form.board == 'maintenance':
+        if form.id.strip(): id = '>' + form.id
+        else: id = '%.03f' % time.time()
+        file = open('/web/internal/maintenance.txt', 'a')
+        file.write('%s\t%s' % (id, line))
+        file.close()
+        url = '/maintenance.cgi'
+        query = ''
+    else:
+        file = open('/web/internal/notes.txt', 'a')
+        file.write(line)
+        file.close()
+
+redirect(url + (query and '?' + query))

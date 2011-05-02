@@ -1,0 +1,802 @@
+"""This module provides utility functions for all the CGI scripts to use.
+This includes functions for reading and storing data in files on disk,
+formatting HTML, and handling dates."""
+
+# By Ka-Ping Yee <ping@zesty.ca>, a Kingmanite from 2000 to 2008.
+
+import cgitb; cgitb.enable()
+import sys, os, re, time
+from os.path import join, dirname, exists, isdir, isfile, getmtime, getsize
+from urllib import quote as urlquote
+
+WEB_ROOT = '/web/internal'
+sys.path.append(WEB_ROOT)
+os.chdir(WEB_ROOT)
+
+def plural(n, singular='', plural='s'):
+    try:
+        n = len(n)
+    except:
+        pass
+    if n == 1:
+        return singular
+    return plural
+
+def shell_quote(s):
+    return "'%s'" % s.replace("'", "'\\''")
+
+safe = {}
+for c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_.-/':
+    safe[c] = 1
+
+def cgi_encode(s):
+    return ''.join(map(
+        lambda c, safe=safe, ord=ord: c in safe and c or '%%%02X' % ord(c), s))
+
+def form_encode(**args):
+    return '&'.join([cgi_encode(name) + '=' + cgi_encode(str(value))
+                     for name, value in args.items()])
+
+def form_url(url, **args):
+    return url + '?' + form_encode(**args)
+
+# ------------------------------------------------------------- file storage
+
+def mkdir(name, mode=0777):
+    if not os.path.isdir(name):
+        os.mkdir(name)
+    if os.stat(name).st_mode & 0777 != mode:
+        os.chmod(name, mode)
+
+def remove(name):
+    if os.path.exists(name):
+        os.remove(name)
+
+def read_file(filename):
+    """Return a string containing the contents of the specified file."""
+    try:
+        return open(filename).read()
+    except IOError:
+        return ''
+
+def write_file(filename, content):
+    """Overwrite the specified file with the given content."""
+    file = open(filename, 'w')
+    file.write(content)
+    file.close()
+
+def append_file(filename, content):
+    """Append the given content to the specified file."""
+    file = open(filename, 'a')
+    file.write(content)
+    file.close()
+
+def read_lines(filename):
+    """Return a list of strings containing the lines of the specified file,
+    not including the trailing newline, and skipping blank or comment lines."""
+    return [line.rstrip('\n')
+            for line in read_file(filename).split('\n')
+            if line.strip() and not line.startswith('#')]
+
+def write_lines(filename, lines):
+    """Overwrite the specified file with the given lines.  Each item in the
+    list of lines should be a string with no trailing newline."""
+    write_file(filename, '\n'.join(lines) + '\n')
+
+def append_lines(filename, lines):
+    """Append the given lines to the specified file.  Each item in the
+    list of lines should be a string with no trailing newline."""
+    append_file(filename, '\n'.join(lines) + '\n')
+
+def read_records(filename, nfields=0, separator='\t'):
+    """Return a list of records, where each record is a list of fields
+    corresponding to a line read from the specified file, split up by the
+    specified separator.  Blank lines and comment lines are skipped."""
+    return [line.split(separator, nfields - 1) for line in read_lines(filename)]
+
+def write_records(filename, records, separator='\t'):
+    """Overwrite the specified file with the specified list of records."""
+    write_lines(filename, [separator.join(map(str, r)) for r in records])
+
+def append_records(filename, records, separator='\t'):
+    """Append the given records to the specified file."""
+    append_lines(filename, [separator.join(map(str, r)) for r in records])
+
+# -------------------------------------------------------------- page output
+
+def abort(title, *message):
+    prologue('Kingman Hall: ' + title, '/style.css')
+    write(h1(esc(title)), p, message)
+    epilogue()
+    sys.exit()
+
+def redirect(url):
+    print 'Location:', url
+    print
+    sys.exit()
+
+def flatten(stuff):
+    if type(stuff) in (list, tuple):
+        return ''.join(map(flatten, stuff))
+    return str(stuff)
+
+def write(*stuff):
+    sys.stdout.write(flatten(stuff))
+    sys.stdout.flush()
+
+def write_template(filename, **pairs):
+    output = read_file(filename)
+    for key, value in pairs.items():
+        output = output.replace('__' + key + '__', flatten(value))
+    write(output)
+
+# --------------------------------------------------------------------- HTML
+
+_rename = {'pad': 'cellpadding', 'space': 'cellspacing', 'c': 'class'}.get
+def _attrs(d):
+    return ''.join([ ' %s="%s"' % (_rename(k, k).replace('_', ''), d[k])
+                    for k in d if d[k] is not None])
+def _maketag(name, br=''):
+    return lambda *stuff, **attrs: [
+        '<%s%s%s>' % (name, _attrs(attrs), br), stuff, '</%s>' % name, br]
+def curry(tag, **defaults):
+    def result(*stuff, **attrs):
+        dict = defaults.copy()
+        dict.update(attrs)
+        return tag(*stuff, **dict)
+    return result
+
+g = globals()
+for t in 'a span th td li strong label textarea option'.split():
+    g[t] = _maketag(t)
+for t in 'h1 h2 h3 div form table tr ul ol'.split():
+    g[t] = _maketag(t, '\n')
+
+table = curry(table, pad=0, space=0)
+tablew = curry(table, width='100%')
+tdr = curry(td, align='right')
+trt = curry(tr, valign='top')
+p, hr, br = '\n<p>', '<hr>\n', '<br>\n'
+nbsp, ndash, mdash = '&nbsp;', '&ndash;', '&mdash;'
+dot = ' &middot; '
+ldq = u'\u201c'.encode('utf-8')
+rdq = u'\u201d'.encode('utf-8')
+lsq = u'\u2018'.encode('utf-8')
+rsq = u'\u2019'.encode('utf-8')
+
+def input(**attrs): return '<input%s>' % (_attrs(attrs))
+def img(src, **attrs): return '<img src="%s"%s>' % (src, _attrs(attrs))
+def esc(text): return text.replace('&', '&amp;').replace('<', '&lt;').replace('"', '&quot;')
+def link(url, *contents, **attrs): return a(contents, href=url, **attrs)
+
+started = 0 
+def prologue(title, stylesheet=None):
+    global started
+    if started: return
+    started = 1
+    write('Content-Type: text/html; charset=utf-8\n\n')
+    write('''<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+              "http://www.w3.org/TR/html4/strict.dtd"><html>''')
+    write('<head><title>' + esc(title) + '</title>\n')
+    if stylesheet:
+        write('<link rel="stylesheet" href="%s">' % stylesheet)
+    write('</head><body>')
+    write(read_file(join(WEB_ROOT, 'title.html')))
+
+def epilogue():
+    host = os.environ.get('HTTP_HOST', '10.0.0.1')
+    if re.match(r'^\d+\.\d+\.\d+\.\d+$', host):
+        host = 'kingmanhall.org/internal'
+    url = ('http://' + host + os.environ['SCRIPT_NAME'] +
+           os.environ.get('PATH_INFO', ''))
+    write('''<div class="footer">
+made with <a href="http://python.org/">Python</a>,
+<a href="http://validator.w3.org/check?uri=%s">HTML</a>,
+<a href="http://jigsaw.w3.org/css-validator/validator?uri=%s">CSS</a>
+</div>''' % (url, url))
+    write('</body></html>')
+    raise SystemExit
+
+def multicolumn(items, columns=3, rows=None, **attrs):
+    cells = []
+    if not rows: rows = (len(items) + columns - 1) / columns
+    width = str(100/columns) + '%'
+    cell = []
+    for item in items:
+        cell.append(div(item))
+        if len(cell) == rows:
+            cells.append(td(cell, width=width))
+            cell = []
+    if cell: cells.append(td(cell, width=width))
+    return tablew(trt(cells), **attrs)
+
+class TableMaker:
+    """Queue up groups of cells to be shown in a fixed number of columns."""
+    def __init__(self, nrows, ncolumns, **attrs):
+        self.nrows, self.ncolumns, self.attrs = nrows, ncolumns, attrs
+        self.rows = [[] for i in range(nrows)]
+        self.content = []
+
+    def add(self, *cells):
+        assert len(cells) == self.nrows
+        for i, cell in enumerate(cells):
+            self.rows[i].append(cell)
+        if len(self.rows[0]) == self.ncolumns:
+            self.content += [tr(row) for row in self.rows]
+            self.rows = [[] for i in range(self.nrows)]
+
+    def flush(self, *cells):
+        if self.rows[0]:
+            if cells:
+                while len(self.rows[0]) < self.ncolumns:
+                    for i, cell in enumerate(cells):
+                        self.rows[i].append(cell)
+            self.content += [tr(row) for row in self.rows]
+        if self.content:
+            write(table(self.content, **self.attrs))
+        self.content = []
+        self.rows = [[] for i in range(self.nrows)]
+
+# -------------------------------------------------------------------- dates
+
+daynames = 'Monday Tuesday Wednesday Thursday Friday Saturday Sunday'.split()
+monthnames = '''x January February March April May June 
+                July August September October November December'''.split()
+
+class Date:
+    def __init__(self, year, month, day):
+        self.year, self.month, self.day = year, month, day
+        self.time = time.mktime((year, month, day, 0, 0, 0, 0, 0, 0))
+        y, l, d, h, m, s, self.weekday = time.localtime(self.time)[:7]
+
+    def __repr__(self):
+        return '%04d-%02d-%02d' % (self.year, self.month, self.day)
+
+    def __hash__(self):
+        return hash((self.year, self.month, self.day))
+
+    def __cmp__(self, other):
+        return cmp((self.year, self.month, self.day),
+                   (other.year, other.month, other.day))
+
+    def __add__(self, days):
+        return Date(*time.localtime(self.time + days*24*3600)[:3])
+
+    def __sub__(self, days):
+        return Date(*time.localtime(self.time - days*24*3600)[:3])
+
+    def format(self, format):
+        return format.replace('%yyyy', '%04d' % self.year
+                    ).replace('%y', '%d' % self.year
+                    ).replace('%mmmm', monthnames[self.month]
+                    ).replace('%mmm', monthnames[self.month][:3]
+                    ).replace('%mm', '%02d' % self.month
+                    ).replace('%m', '%d' % self.month
+                    ).replace('%dddd', daynames[self.weekday]
+                    ).replace('%ddd', daynames[self.weekday][:3]
+                    ).replace('%dd', '%02d' % self.day
+                    ).replace('%d', '%d' % self.day)
+
+def get_date(t=None):
+    """Get the current date, or convert a Unix time to a Date object."""
+    return Date(*time.localtime(t or time.time())[:3])
+
+def parse_date(text):
+    """Convert a YYYY-MM-DD or MM/DD/YYYY string to a Date object."""
+    text = text.split()[0]
+    if re.match(r'^\d+-\d+-\d+$', text):
+        year, month, day = map(int, text.split('-'))
+    elif re.match(r'^\d+/\d+/\d+$', text):
+        month, day, year = map(int, text.split('/'))
+    else:
+        raise ValueError('date in bad format: %r' % text)
+    return Date(year, month, day)
+
+def get_file_date(path):
+    """Get the modification date on a file."""
+    return Date(*time.localtime(getmtime(path))[:3])
+
+# --------------------------------------------------------- events and notes
+
+wiki = None
+wikiurl = None
+
+def format_text(text,
+                bpat=re.compile(r'\*\*([^\t\n*]+)\*\*'),
+                upat=re.compile(r'\*_([^\t\n*]+)_\*'),
+                spat=re.compile(r'\*-([^\t\n*]+)-\*'),
+                ipat=re.compile(r'([[(\s])\*(\S([^*]*\S)?)\*([]):;,.!?\s])'),
+                urlpat=re.compile(r'ht((tps?://[^\s/]+)(/\S*[^\s:;,.!?()]))'),
+                durlpat=re.compile(r'ht((tps?://[^\s/]+)/?)'),
+                mailpat=re.compile(r'(\w[\w.-]+@[a-z][\w.-]+\.[a-z]{2,3})\b'),
+                parapat=re.compile(r'\n\n+'),
+                brpat=re.compile(r'\n+'),
+                hrpat=re.compile(r'\n *----*'),
+#               olllipat=re.compile(r'\n *::([a-z]|\d+)\.(.*)'),
+#               ollipat=re.compile(r'\n *:([a-z]|\d+)\.(.*)'),
+#               olipat=re.compile(r'\n *([a-z]|\d+)\.(.*)'),
+                lllipat=re.compile(r'\n *::-(.*)'),
+                llipat=re.compile(r'\n *:-(.*)'),
+                lipat=re.compile(r'\n *-(.*)'),
+                ddddpat=re.compile(r'\n *:::(.*)'),
+                dddpat=re.compile(r'\n *::(.*)'),
+                ddpat=re.compile(r'\n *:(.*)'),
+                h2pat=re.compile(r'\n *!!(.*)'),
+                h3pat=re.compile(r'\n *!(.*)'),
+                blockstartpat=re.compile(r'\t+(<(h3|ul|dl)>)'),
+                blockendpat=re.compile(r'(</(h3|ul|dl)>)\t+'),
+                dljoinpat=re.compile(r'</dl>\s*(<dd>)?<dl>'),
+                uljoinpat=re.compile(r'</ul>\s*(<li>)?<ul>'),
+                oljoinpat=re.compile(r'</ol>\s*(<li>)?<ol>'),
+                backslashpat=re.compile(r'\\(.)'),
+                wikilinkpat=re.compile(r'\[([^]\\\n]+)\]'),
+               ):
+    text = '\n' + esc(text) + ' '
+    text = hrpat.sub(r'\n<hr>', text)
+    text = text.replace(' -- ', '&nbsp;&mdash; ')
+    text = text.replace('--', '&mdash;')
+#   text = olllipat.sub(r'\n<ol><ol><ol><li value="\1">\2</ol></ol></ol>', text)
+#   text = ollipat.sub(r'\n<ol><ol><li value="\1">\2</ol></ol>', text)
+#   text = olipat.sub(r'\n<ol><li value="\1">\2</ol>', text)
+    text = lllipat.sub(r'\n<ul><ul><ul><li>\1</ul></ul></ul>', text)
+    text = llipat.sub(r'\n<ul><ul><li>\1</ul></ul>', text)
+    text = lipat.sub(r'\n<ul><li>\1</ul>', text)
+    text = ddddpat.sub(r'\n<dl><dd><dl><dd><dl><dd>\1</dl></dl></dl>', text)
+    text = dddpat.sub(r'\n<dl><dd><dl><dd>\1</dl></dl>', text)
+    text = ddpat.sub(r'\n<dl><dd>\1</dl>', text)
+    text = h2pat.sub(r'\n<h2>\1</h2>', text)
+    text = h3pat.sub(r'\n<h3>\1</h3>', text)
+    text = parapat.sub('\t\t', text.strip())
+    text = brpat.sub('\t', text)
+    if wiki:
+        pos = 0
+        results = []
+        while 1:
+            match = wikilinkpat.search(text, pos)
+            if not match:
+                break
+            code = match.group(1)
+            # Everything got escaped, so we have to undo it now. :(
+            code = code.replace('&lt;', '<').replace('&amp;', '&')
+            if '@' in code:
+                anchor, title = code.split('@', 1)
+                anchor = anchor.strip()
+                title = title.strip()
+            else:       
+                anchor = title = code.strip()
+            anchor = esc(anchor)
+            id = wiki.get_id(title)
+            c = 'wiki'
+            if wiki.contains(id):
+                url = id
+                title = 'Kwiki: ' + ldq + wiki.get_title(id) + rdq
+            else:
+                new_ids = wiki.find_new_ids(id)
+                if new_ids:
+                    url = id + '?' + form_encode(title=title)
+                    anchor = '<span class="moved">%s</span>' % anchor
+                    title = 'Kwiki: page exists with a new name'
+                else:
+                    url = ':new?' + form_encode(title=title)
+                    c += ' missing'
+                    title = 'Kwiki: no such page yet (click to create)'
+            results += [text[pos:match.start()] +
+                        '<a href="%s/%s" class="%s" title="%s">[%s]</a>' % (
+                        wikiurl.replace('http', 'ht&nbsp;tp'),
+                        url, c, esc(title), anchor)]
+            pos = match.end()
+        text = ''.join(results) + text[pos:]
+    text = urlpat.sub(r'<a href="ht&nbsp;\1">ht&nbsp;\2/...</a>', text)
+    text = durlpat.sub(r'<a href="ht&nbsp;\1">ht&nbsp;\2/</a>', text)
+    text = text.replace('ht&nbsp;tp', 'http')
+    text = mailpat.sub(r'<a href="mailto:\1">\1</a>', text)
+    text = text.replace('\x92', "'")
+    text = bpat.sub(r'<b>\1</b>', text)
+    text = upat.sub(r'<u>\1</u>', text)
+    text = spat.sub(r'<del>\1</del>', text)
+    text = ipat.sub(r'\1<i>\2</i>\4', ' ' + text + ' ')
+    text = ipat.sub(r'\1<i>\2</i>\4', ' ' + text + ' ')
+    text = uljoinpat.sub('\n', text)
+    text = uljoinpat.sub('\n', text)
+    text = uljoinpat.sub('\n', text)
+    text = oljoinpat.sub('\n', text)
+    text = oljoinpat.sub('\n', text)
+    text = oljoinpat.sub('\n', text)
+    text = dljoinpat.sub('\n', text)
+    text = dljoinpat.sub('\n', text)
+    text = dljoinpat.sub('\n', text)
+    text = blockstartpat.sub('\n\\1', text)
+    text = blockendpat.sub('\\1\n', text)
+    text = text.replace('\t\t', '\n<p>')
+    text = text.replace('\t', '<br>\n')
+    text = backslashpat.sub('\\1', text)
+    return text
+
+def get_events(file='events.txt'):
+    return [(parse_date(date), title, details)
+            for date, title, details in read_records(file, 3)]
+
+def format_event(event):
+    date, title, details = event
+    today = get_date()
+    c = 'event'
+    if date < today: c += ' past'
+    if date == today: c += ' today'
+    body = span(title, c='title')
+    if details.strip():
+        details = details.replace('\t', '\n')
+        body += ': ' + format_text(details)
+    date = date and date.format('%ddd %d %mmm ') or '?'
+    return trt(td(date, c='date'), td(body, c='body'), c=c)
+
+def get_notes(file='notes.txt'):
+    return [(parse_date(date.split()[0]), date.split()[1], name, note)
+            for date, name, note in read_records(file, 3)]
+
+def format_note_cells(note, rowspan=None):
+    date, time, name, text = note
+    text = text.replace('\t', '\n')
+    body = [span(name, c='author'), ': ', format_text(text)]
+    date = [date.format('%ddd %d %mmm  '), span(time, c='time')]
+    return [td(date, c='date', rowspan=rowspan),
+            td(body, c='body', rowspan=rowspan)]
+
+def format_note(note):
+    return trt(format_note_cells(note), c='note')
+
+def format_request(request):
+    date, time, name, movie, comment = request
+    body = [span(name, c='author'), ': ', span(format_text(movie), c='movie'), format_text(comment)]
+    date = [date.format('%ddd %d %mmm  '), span(time, c='time')]
+    return trt(td(date, c='date'), td(body, c='body'), c='request')
+
+# ------------------------------------------------------------------ members
+
+class Member(dict):
+    def __init__(self, **items):
+        self.update(items)
+
+    def __getitem__(self, key):
+        return self.get(key, '')
+
+def get_member_ids(dir='members'):
+    return [int(file[:-2]) for file in os.listdir(dir) if file.endswith('.m')]
+
+def get_members(dir='members'):
+    return [get_member(id, dir) for id in get_member_ids(dir)]
+
+def get_member(id, dir='members'):
+    member = Member(id=id)
+    for line in open(join(dir, '%d.m' % id)):
+        key, value = line.split(':', 1)
+        member[key] = value.strip()
+    return member
+
+def put_member(new, time, author, dir='members'):
+    id = new['id']
+    old = get_member(id)
+    entries = []
+    fields = []
+    for key in old:
+        value = new.get(key, '')
+        if old[key] != value:
+            entries.append('%d\t%s\t%s: %s\n' % (time, author, key, value))
+    for key in new:
+        if key not in old:
+            entries.append('%d\t%s\t%s: %s\n' % (time, author, key, new[key]))
+        if key != 'id':
+            fields.append('%s: %s\n' % (key, new[key]))
+    file = open(join(dir, '%d.v' % id), 'a')
+    file.write(''.join(entries))
+    file.close()
+    file = open(join(dir, '%d.m' % id), 'w')
+    file.write(''.join(fields))
+    file.close()
+
+def next_member_id(dir='members'):
+    next_id = max([0] + get_member_ids(dir)) + 1
+    file = open(join(dir, '%d.m' % next_id), 'w')
+    file.close()
+    return next_id
+
+# ------------------------------------------------------------------ hotness
+
+# Part 1.  General hotness.
+#
+# Let P be the population of Kingman, and let N be the number of respondents
+# to the survey.  Suppose that all N respondents, R[1] through R[N], are in
+# a room and a random Kingmanite, K, walks in.  What is the expected number
+# of respondents that would totally do K?
+#
+# Suppose each respondent R[i] entered X[i] as the number of housemates they
+# would totally do.  Then the probability that K is one of those housemates
+# is X[i]/P.  Therefore, the expected number of respondents that would do K
+# is the sum of X[i]/P for all respondents.  As a fraction of the number of
+# respondents, this is sum(X[i]/P)/N, or the average value of X[i]/P.
+#
+# Thus, when K walks into a room containing a random sample of respondents,
+# one can expect that sum(X[i]/P)/N of them would totally do K.  Assuming
+# the respondents are representative of the house as a whole, this is also
+# the fraction of Kingmanites in a room who would totally do K.  We define
+# this quantity to be the "Hotness Quotient" of the house.
+
+# Part 2.  Gender-specific hotness.
+#
+# If the survey respondents also indicate whether they are male or female
+# and whether they are attracted to women, to men, or to both, then it's
+# also possible to calculate more specific quotients for each combination
+# of genders -- that is, when a [male or female] Kingmanite walks into a
+# room, what fraction of the other [male, female, or all] Kingmanites in
+# the room would totally do him or her.
+#
+# Let's call the gender of the lusting person the "subject gender" and that
+# of the person being lusted after the "object gender".  Suppose we want to
+# calculate the hotness quotient for a specific subject gender and object
+# gender.  Let Ns be the number of respondents of the appropriate subject
+# gender, and let the respondents be Rs[1] through Rs[Ns], where Xs[i] is
+# the number that Rs[i] entered.
+#
+# Clearly Rs[i] only contributes to this gender-specific quotient if the
+# object gender is one of the genders that Rs[i] appreciates.  If so, let
+# Po[i] be the total number of all Kingmanites of a gender that Rs[i]
+# appreciates; then the probability that K is one of the housemates Rs[i]
+# would totally do is Xs[i]/Po[i].  The sum of Xs[i]/Po[i] over all the
+# respondents is the expected number of respondents that would do K.  As
+# a fraction of the number of respondents of the subject gender, this is
+# sum(Xs[i]/Po[i])/Ns.  And that's the gender-specific HQ.
+
+def safe_average(list):
+    if list:
+        return float(sum(list))/len(list)
+
+def percentage(fraction):
+    if fraction is None:
+        return '?'
+    return '%d%%' % (fraction*100 + 0.5)
+
+def get_hotness(category, population, file='hotness.txt'):
+    """The 'category' argument specifies which verb we want to examine the
+    survey responses for ("totally do" is just one possibility).  The
+    'population' argument is a dictionary mapping each gender to the number
+    of Kingmanites of that gender.  Gender is coded as 'f' or 'm'."""
+    terms = {}
+    for subject in population.keys() + ['any']:
+        for object in population.keys() + ['any']:
+            terms[(subject, object)] = []
+
+    counts = {}
+    p = sum(population.values())
+    records = [r[2:] for r in read_records(file) if r[1] == category]
+    for subject, objects, number in records:
+        try:
+            x = float(number)
+            po = sum([population[object] for object in objects])
+        except:
+            continue
+        counts[(subject, objects)] = counts.get((subject, objects), 0) + 1
+        terms[('any', 'any')].append(x/p)
+        terms[(subject, 'any')].append(x/p)
+        for object in population:
+            term = (object in objects) and x/po or 0
+            terms[('any', object)].append(term)
+            terms[(subject, object)].append(term)
+
+    averages = {}
+    for subject, object in terms:
+        averages[(subject, object)] = safe_average(terms[(subject, object)])
+    return averages, counts
+
+# -------------------------------------------------------------------- toner
+
+def get_toner_records(count, file='printer.log'):
+    """Get the last 'count' entries from the printer supplies log."""
+    records = {}
+    for line in os.popen("tail -%d %s" % (count, shell_quote(file))):
+        words = line.split()
+        date, time = words[:2]
+        records[date] = {}
+        for word in words[2:]:
+            name, value = word.split('=')
+            records[date][name] = value.replace('%', '')
+    return records
+
+# ---------------------------------------------------------------------- wiki
+
+# Wiki storage works like this:
+#
+# A file called "index" at the wiki storage root location is the master index
+# of all pages, with one line per page containing four tab-separated fields:
+# the page title, a space-separated list of tags, the last change date as a
+# Unix integer time, and a space-separated list of pathnames.  The pathnames
+# are relative to the wiki storage root and point to files containing all the
+# versions of the page.
+#
+# When a page is edited, the new content is written to a new file and the
+# path to this new file is added to the index.  In theory this file could
+# be anywhere and have any name, but by convention the file is placed in a
+# subdirectory named after the current year and the file's name is a unique
+# number (e.g. the first file stored in 2008 goes at "2008/1").
+#
+# Each of these files consists of a MIME-style header section, a blank line,
+# then the body in wikitext.  The headers include "title" for the title of
+# the page and "tags" for a space-separated list of tags for searching
+# (singular is preferred to plural).  The revision date is determined from
+# the file's mtime, not from a header.
+#
+# The index represents the ultimate truth about what pages exist, how many
+# versions there are, and where they reside.  Updates to the index are
+# applied atomically (using os.rename) so that the stored data is never
+# inconsistent.  If two updates are taking place simultaneously, it is
+# possible for one of them to be ignored; I decided that this weakness (and
+# the overhead of rewriting the entire index on every edit) was an
+# acceptable trade-off in favour of simple and reliable data integrity.
+
+def int_or_zero(s):
+    try:
+        return int(s)
+    except:
+        return 0
+
+def get_highest_numbered_file(dir):
+    return max(map(int_or_zero, os.listdir(dir) + [0]))
+
+class Wiki:
+    def __init__(self, root):
+        if not os.path.isdir(root):
+            os.mkdir(root)
+        self.root = root
+        self.index_path = os.path.join(root, 'index')
+        self.index = {}
+        for record in read_records(self.index_path):
+            if len(record) == 4:
+                record += ('',)
+            title, tags, date, files, old_ids = record
+            self.index[self.get_id(title)] = (
+                title, sorted(tags.split()), int(date),
+                files.split(), old_ids.split())
+
+    def update_old_ids(self):
+        for id in self.index:
+            old_ids = []
+            last_id = ''
+            for version in range(self.get_num_versions(id)):
+                date, meta, body = self.get_page(id, version)
+                next_id = self.get_id(meta['title'])
+                if next_id != last_id and last_id:
+                    old_ids.append(last_id)
+                last_id = next_id
+            self.index[id] = self.index[id][:4] + (old_ids,)
+
+    def write_index(self):
+        """Internal.  Write out the current master index."""
+        outpath = '%s.%d' % (self.index_path, os.getpid())
+        write_records(outpath,
+                      [(title, ' '.join(tags), str(int(date)),
+                        ' '.join(files), ' '.join(old_ids))
+                       for title, tags, date, files, old_ids in
+                       self.index.values()])
+        os.rename(outpath, self.index_path)
+
+    def move_to_next_number(self, source, dir):
+        """Internal.  Move a file to the next number in a given directory."""
+        while 1:
+            number = get_highest_numbered_file(dir) + 1
+            path = os.path.join(dir, str(number))
+            try:
+                # Use os.link because it won't replace an existing file.
+                os.link(source, path)
+                os.remove(source)
+                return number
+            except OSError, e:
+                if e.errno != 17: # Catch only an "already exists" error.
+                    raise
+
+    def get_id(self, title):
+        """Convert (normalize) a title to a page identifier."""
+        title = re.sub('[^0-9a-z_ ]', '', title.lower())
+        title = re.sub(r'\s+', ' ', title.replace('_', ' ').strip())
+        return title.replace(' ', '_')
+
+    def list_ids(self):
+        """Get a sorted list of all the page identifiers."""
+        return sorted(self.index.keys())
+
+    def contains(self, id):
+        """Determine whether a page exists."""
+        return id in self.index
+
+    def get_title(self, id):
+        """Get the title of a page."""
+        title, tags, date, files, old_ids = self.index[id]
+        return title
+
+    def get_tags(self, id):
+        """Get the tags for a page."""
+        title, tags, date, files, old_ids = self.index[id]
+        return tags
+
+    def get_num_versions(self, id):
+        """Get the number of versions of a page."""
+        title, tags, date, files, old_ids = self.index[id]
+        return len(files)
+
+    def get_ttdvo(self, id):
+        """Get the title, tag list, date, number of versions, and list of
+        old ids for a page."""
+        title, tags, date, files, old_ids = self.index[id]
+        return title, tags, date, len(files), old_ids
+
+    def list_ittdvos(self):
+        """Return a list of 5-tuples, one for each page, containing its
+        id, title, tag list, date, number of versions, and list of old ids."""
+        return [(id,) + self.get_ttdvo(id) for id in self.index]
+
+    def find_new_ids(self, old_id):
+        """Get a list of the current ids that correspond to an old page id."""
+        new_ids = []
+        for new_id in self.index:
+            title, tags, date, versions, old_ids = self.index[new_id]
+            if old_id in old_ids:
+                new_ids.append(new_id)
+        return new_ids
+
+    def get_page(self, id, version=-1):
+        """Retrieve the date, metadata, and body for a page.  Specify a
+        version number (from 0 to n - 1) to get a particular version."""
+        title, tags, date, files, old_ids = self.index[id]
+        path = os.path.join(self.root, files[version])
+        date = os.path.getmtime(path)
+        data = read_file(path)
+        if '\n\n' in data:
+            headers, body = data.split('\n\n', 1)
+        else:
+            headers, body = '', data
+        meta = {'title': title, 'tags': ' '.join(tags)}
+        for line in headers.split('\n'):
+            if ':' in line:
+                name, value = line.split(':', 1)
+                meta[name.strip().lower()] = value.strip()
+        return date, meta, body
+
+    def put_page(self, id, meta, body, merge=0):
+        """Update or create a page with the given metadata and body.  The
+        title of the page is also updated according to meta['title'].  If
+        meta['title'] identifies a different page that already exists, and
+        'merge' is 0, then a ValueError is raised.  If meta['title']
+        identifies an existing other page and 'merge' is 1, the page history
+        is appended to the history of the other page."""
+        outpath = os.path.join(self.root, 'new.%d' % os.getpid())
+        file = open(outpath, 'w')
+        for key in meta:
+            meta[key] = re.sub(r'\s+', ' ', meta[key].strip())
+            file.write('%s: %s\n' % (key.lower(), meta[key]))
+        file.write('\n' + body.rstrip() + '\n')
+        file.close()
+
+        year = str(time.localtime()[0])
+        dir = os.path.join(self.root, year)
+        if not os.path.isdir(dir):
+            os.mkdir(dir)
+        number = self.move_to_next_number(outpath, dir)
+        new_file = os.path.join(year, str(number))
+        new_date = os.path.getmtime(os.path.join(self.root, new_file))
+
+        files, old_ids = self.index.get(id, ('', '', '', [], []))[3:5]
+        new_id = self.get_id(meta['title'])
+        if not new_id:
+            raise ValueError('target page id is empty')
+        if new_id != id:
+            old_ids.append(id)
+            if new_id in self.index:
+                if merge:
+                    files[:0] = self.index[new_id][3]
+                else:
+                    raise ValueError('target page id is already in use')
+
+        files.append(new_file)
+        if id in self.index:
+            del self.index[id]
+        self.index[new_id] = (meta['title'], meta.get('tags', '').split(),
+                              int(new_date), files, old_ids)
+        self.write_index()
+        return len(files)

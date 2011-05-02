@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+import time
+
+ipaddr = None
+leases = {}
+text = open('/var/state/dhcp/dhcpd.leases').read()
+start = text.find('\nlease')
+for stanza in text[start + 1:].split('\n}'):
+    start = stanza.find('{\n')
+    if start < 0: break
+    intro, stanza = stanza.split('{\n', 1)
+    ipaddr = intro.split()[-1]
+    fields = {}
+    fields['start'] = (0, 0, 0, 0, 0, 0)
+    fields['end'] = (0, 0, 0, 0, 0, 0)
+    fields['mac'] = ''
+    fields['name'] = ''
+    fields['abandoned'] = 0
+    for line in stanza.split('\n'):
+        words = line[:-1].split()
+        if words[0] == 'starts':
+            y, l, d = map(int, words[2].split('/'))
+            h, m, s = map(int, words[3].split(':'))
+            fields['start'] = (y, l, d, h, m, s)
+        elif words[0] == 'ends':
+            y, l, d = map(int, words[2].split('/'))
+            h, m, s = map(int, words[3].split(':'))
+            fields['end'] = (y, l, d, h, m, s)
+        elif words[:2] == ['hardware', 'ethernet']:
+            fields['mac'] = words[2]
+        elif words[0] == 'client-hostname':
+            name = words[1]
+            if name.startswith('"'):
+                name = eval(name)
+            fields['name'] = name
+        elif words[0] == 'abandoned':
+            fields['abandoned'] = 1
+
+now = time.gmtime(time.time())[:6]
+for ipaddr, fields in leases.items():
+    if not fields['abandoned']:
+        if fields['start'] <= now <= fields['end']:
+            print ipaddr, fields['name'], fields['mac']
